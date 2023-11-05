@@ -29,7 +29,7 @@ class MACPacket:
 class IPPacket(MACPacket):
 
     def __str__(self):
-        return super().__str__() + f"IP:" \
+        return super().__str__() + f"IP: " \
                             f"  Source IP: {self.get_source_ip()}" \
                             f"  Destination IP: {self.get_destination_ip()}\n" \
 
@@ -45,9 +45,7 @@ class TCPPacket(IPPacket):
     def __str__(self):
         return super().__str__() + f"TCP:" \
                             f"  Source Port: {self.get_source_port()}" \
-                            f"  Destination Port: {self.get_destination_port}" \
-                            f"  Protocl: {self.get_protocol()}" \
-                            f"  Data: {self.get_data()}\n"
+                            f"  Destination Port: {self.get_destination_port()}\n"
 
     def get_source_port(self) -> int:
         return self.packet[TCP].sport
@@ -55,17 +53,11 @@ class TCPPacket(IPPacket):
     def get_destination_port(self) -> int:
         return self.packet[TCP].dport
 
-    def get_protocol(self) -> str:
-        return self.packet[IP].proto
-
-    def get_data(self) -> str:
-        return self.packet[TCP].load
-
 
 def to_better_packet(packet):
-    if packet.haslayer(TCP):
+    if packet.haslayer(TCP) and packet.haslayer(IP) and packet.haslayer(Ether):
         return TCPPacket(packet)
-    elif packet.haslayer(IP):
+    elif packet.haslayer(IP) and packet.haslayer(Ether):
         return IPPacket(packet)
     elif packet.haslayer(Ether):
         return MACPacket(packet)
