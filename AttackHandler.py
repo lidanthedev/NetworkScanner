@@ -7,9 +7,5 @@ class AttackHandler(ABC):
         pass
 
     @abstractmethod
-    def test_attack(self):
-        pass
-
-    @abstractmethod
     def protect_attack(self):
         pass
