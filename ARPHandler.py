@@ -9,7 +9,6 @@ class ARPHandler:
 
     def handle_packet(self, better_packet: MACPacket):
         if isinstance(better_packet, ARPPacket):
-            print(better_packet)
             self.handle_arp(better_packet)
 
     def handle_arp(self, arp_packet):
