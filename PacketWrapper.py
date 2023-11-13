@@ -3,6 +3,10 @@ from scapy.layers.inet import IP, TCP
 from scapy.packet import Packet
 import dataclasses
 
+ARP_REPLY_CODE = 2
+
+ARP_REQUEST_CODE = 1
+
 
 @dataclasses.dataclass
 class MACPacket:
@@ -84,9 +88,9 @@ def to_better_packet(packet):
     elif packet.haslayer(IP) and packet.haslayer(Ether):
         return IPPacket(packet)
     elif packet.haslayer(ARP) and packet.haslayer(Ether):
-        if packet[ARP].op == 1:  # ARP Request
+        if packet[ARP].op == ARP_REQUEST_CODE:
             return ARPPacket(packet)
-        elif packet[ARP].op == 2:  # ARP Reply
+        elif packet[ARP].op == ARP_REPLY_CODE:
             return ARPReplyPacket(packet)
     elif packet.haslayer(Ether):
         return MACPacket(packet)

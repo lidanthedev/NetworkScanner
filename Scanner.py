@@ -2,13 +2,20 @@ import PacketWrapper
 from scapy.sendrecv import sniff
 from scapy.sendrecv import AsyncSniffer
 
+from ARPHandler import ARPHandler
+
 
 class Scanner:
+    handlers: list
+
+    def __init__(self):
+        self.handlers = [ARPHandler()]
 
     def handle_packet(self, packet):
         better_packet = PacketWrapper.to_better_packet(packet)
-        if (better_packet is not None):
-            print(better_packet)
+        if better_packet is not None:
+            for handler in self.handlers:
+                handler.handle_packet(better_packet)
 
     def scan(self):
         sniff(prn=self.handle_packet)
