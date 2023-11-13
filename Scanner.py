@@ -1,5 +1,6 @@
 import PacketWrapper
 from scapy.sendrecv import sniff
+from scapy.sendrecv import AsyncSniffer
 
 
 class Scanner:
