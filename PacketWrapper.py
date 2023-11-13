@@ -71,7 +71,8 @@ class ARPReplyPacket(ARPPacket):
     def __str__(self):
         return super().__str__() + f"ARP Reply:" \
                                    f"  Source IP: {self.get_source_ip()}" \
-                                   f"  Destination IP: {self.get_destination_ip()}\n"
+                                   f"  Destination IP: {self.get_destination_ip()}" \
+                                   f"  Reply MAC: {self.get_response_mac()}\n"
 
     def get_response_mac(self) -> str:
         return self.packet[ARP].hwsrc
