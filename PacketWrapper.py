@@ -31,8 +31,8 @@ class IPPacket(MACPacket):
     def __str__(self):
         return super().__str__() + f"IP: " \
                                    f"  Source IP: {self.get_source_ip()}" \
-                                   f"  Destination IP: {self.get_destination_ip()}\n" \
- \
+                                   f"  Destination IP: {self.get_destination_ip()}\n"
+
     def get_source_ip(self) -> str:
         return self.packet[IP].src
 
@@ -83,9 +83,9 @@ def to_better_packet(packet):
     elif packet.haslayer(IP) and packet.haslayer(Ether):
         return IPPacket(packet)
     elif packet.haslayer(ARP) and packet.haslayer(Ether):
-        if packet[ARP].op == 1: # ARP Request
+        if packet[ARP].op == 1:  # ARP Request
             return ARPPacket(packet)
-        elif packet[ARP].op == 2: # ARP Reply
+        elif packet[ARP].op == 2:  # ARP Reply
             return ARPReplyPacket(packet)
     elif packet.haslayer(Ether):
         return MACPacket(packet)
