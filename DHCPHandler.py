@@ -3,8 +3,6 @@ import time
 from AttackHandler import AttackHandler
 import subprocess
 from scapy.layers.dhcp import DHCP
-from PacketWrapper import DHCPPacket
-
 
 class DHCPHandler(AttackHandler):
     def __init__(self):
@@ -33,11 +31,14 @@ class DHCPHandler(AttackHandler):
             else:
                 self.mac_table[network_name] = better_packet.get_source_mac()
 
+
     def protect_attack(self):
         pass
 
-    def is_packet_dhcp_ack(self, better_packet: DHCPPacket):
-        return better_packet.get_dhcp_type == DHCPPacket.ACK
+
+
+    def is_packet_dhcp_ack(self, better_packet):
+        return better_packet.packet[DHCP].options[0][1] == 5
 
     def get_current_ssid(self):
         result = subprocess.check_output(['iwgetid', '--raw'], stderr=subprocess.STDOUT, text=True)
