@@ -3,6 +3,7 @@ import time
 from AttackHandler import AttackHandler
 import subprocess
 from scapy.layers.dhcp import DHCP
+from PacketWrapper import DHCPPacket
 
 
 class DHCPHandler(AttackHandler):
@@ -31,21 +32,12 @@ class DHCPHandler(AttackHandler):
             # save the mac address of the joined network if it's the first time joining it
             else:
                 self.mac_table[network_name] = better_packet.get_source_mac()
-            print(self.mac_table)
-
-
-
-
-
-        self.detect_attack(better_packet)
 
     def protect_attack(self):
         pass
 
-
-
-    def is_packet_dhcp_ack(self, better_packet):
-        return better_packet.packet[DHCP].options[0][1] == 5
+    def is_packet_dhcp_ack(self, better_packet: DHCPPacket):
+        return better_packet.get_dhcp_type == DHCPPacket.ACK
 
     def get_current_ssid(self):
         # Run the 'iwgetid' command to get information about the current Wi-Fi connection

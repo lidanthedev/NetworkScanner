@@ -1,6 +1,7 @@
 from scapy.layers.l2 import Ether
 from scapy.layers.inet import IP, TCP
 from scapy.packet import Packet
+from scapy.layers.dhcp import DHCP
 import dataclasses
 
 
@@ -53,8 +54,24 @@ class TCPPacket(IPPacket):
     def get_destination_port(self) -> int:
         return self.packet[TCP].dport
 
+class DHCPPacket(IPPacket):
+
+        DISCOVER = 1
+        OFFER = 2
+        REQUEST = 3
+        DECLINE = 4
+        ACK = 5
+
+        def __str__(self):
+            return super().__str__() + f"DHCP:" \
+                                f"  DHCP Type: {self.get_dhcp_type()}\n"
+
+        def get_dhcp_type(self) -> int:
+            return self.packet[DHCP].options[0][1]
 
 def to_better_packet(packet):
+    if packet.haslayer(DHCP) and packet.haslayer(Ether) and packet.haslayer(IP):
+        return IPPacket(packet)
     if packet.haslayer(TCP) and packet.haslayer(IP) and packet.haslayer(Ether):
         return TCPPacket(packet)
     elif packet.haslayer(IP) and packet.haslayer(Ether):
