@@ -71,7 +71,7 @@ class DHCPPacket(IPPacket):
 
 def to_better_packet(packet):
     if packet.haslayer(DHCP) and packet.haslayer(Ether) and packet.haslayer(IP):
-        return IPPacket(packet)
+        return DHCPPacket(packet)
     if packet.haslayer(TCP) and packet.haslayer(IP) and packet.haslayer(Ether):
         return TCPPacket(packet)
     elif packet.haslayer(IP) and packet.haslayer(Ether):

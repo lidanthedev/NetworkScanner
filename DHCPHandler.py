@@ -40,9 +40,7 @@ class DHCPHandler(AttackHandler):
         return better_packet.get_dhcp_type == DHCPPacket.ACK
 
     def get_current_ssid(self):
-        # Run the 'iwgetid' command to get information about the current Wi-Fi connection
         result = subprocess.check_output(['iwgetid', '--raw'], stderr=subprocess.STDOUT, text=True)
 
-        # Extract and return the SSID from the command output
         ssid = result.strip()
         return ssid
