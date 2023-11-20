@@ -8,10 +8,10 @@ from ARPHandler import ARPHandler
 
 
 class Scanner:
-    handlers: list
+    handlers: list[AttackHandler]
 
     def __init__(self):
-        self.handlers = [ARPHandler()]
+        self.handlers = [ARPHandler(), DHCPHandler()]
 
     def handle_packet(self, packet):
         better_packet = PacketWrapper.to_better_packet(packet)

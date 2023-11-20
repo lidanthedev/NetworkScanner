@@ -1,7 +1,8 @@
+from AttackHandler import AttackHandler
 from PacketWrapper import ARPPacket, ARPReplyPacket, MACPacket
 
 
-class ARPHandler:
+class ARPHandler(AttackHandler):
     arp_table: dict[str, str]
 
     def __init__(self):
@@ -18,4 +19,9 @@ class ARPHandler:
                 self.arp_table[ip] = arp_packet.get_response_mac()
                 print(f"ADD ARP ENTRY: IP {ip} has MAC address {self.arp_table[ip]}")
             elif arp_packet.get_response_mac() != self.arp_table[ip]:
-                print(f"DETECTED ARP POISONING: IP {ip} has multiple MAC addresses: {self.arp_table[ip]} and {arp_packet.get_response_mac()}")
+                print(
+                    f"DETECTED ARP POISONING: IP {ip} has multiple MAC addresses: {self.arp_table[ip]} and {arp_packet.get_response_mac()}"
+                )
+
+    def protect_attack(self):
+        print("PROTECT ARP!!!!")
