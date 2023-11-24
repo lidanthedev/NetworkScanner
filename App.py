@@ -1,9 +1,11 @@
 from flask import Flask
 from flask import request
+from flask_cors import CORS
 
 from Scanner import Scanner
 
 app = Flask(__name__)
+CORS(app)
 
 scanner = Scanner()
 
@@ -14,12 +16,13 @@ def toggle():
         scanner.stop()
     else:
         scanner.start()
-    return str(scanner.state)
+    
+    return {"state": scanner.state}
 
 
 @app.route("/getState")
 def getState():
-    return str(scanner.state)
+    return {"state": scanner.state}
 
 
 if __name__ == "__main__":

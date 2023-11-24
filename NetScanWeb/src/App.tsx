@@ -1,35 +1,42 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import './App.css';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [scannerState, setScannerState] = useState(false);
+
+  useEffect(() => {
+    const fetchScannerState = async () => {
+      const state = await toggleScanner();
+      setScannerState(state);
+    };
+
+    fetchScannerState();
+  }, []);
 
   return (
     <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 2)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+      <h1>Toggle Scanner</h1>
+      <button onClick={async () => {
+        const state = await toggleScanner();
+        setScannerState(state);
+      }}>
+      Scanner is now {scannerState ? "On" : "Off"}
+    </button>
+  </>
   )
 }
 
-export default App
+async function toggleScanner(): Promise<boolean> {
+  const response = await fetch('http://localhost:5000/toggle');
+  const data = await response.json();
+  return data["state"];
+}
+
+async function getScannerState(): Promise<boolean> {
+  const response = await fetch('http://localhost:5000/getState');
+  const data = await response.json();
+  return data["state"];
+}
+
+export default App;
