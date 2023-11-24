@@ -1,9 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import './App.css';
 
 function App() {
   const [scannerState, setScannerState] = useState(false);
-  const stateBtn: HTMLButtonElement = document.getElementById("stateBtn") as HTMLButtonElement;
+  const stateBtnRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     const fetchScannerState = async () => {
@@ -17,11 +17,14 @@ function App() {
   return (
     <>
       <h1>Toggle Scanner</h1>
-      <button id="stateBtn" onClick={async () => {
-        stateBtn.disabled = true;
+      <button ref={stateBtnRef} onClick={async () => {
+        if (stateBtnRef.current == null) {
+          return;
+        }
+        stateBtnRef.current.disabled = true;
         const state = await setScanner(!scannerState);
         setScannerState(state);
-        stateBtn.disabled = false;
+        stateBtnRef.current.disabled = false;
       }}>
       Scanner is now {scannerState ? "On" : "Off"}
     </button>
