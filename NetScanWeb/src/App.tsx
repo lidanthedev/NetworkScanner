@@ -35,7 +35,7 @@ async function setScanner(mode: boolean): Promise<boolean> {
     headers: {
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({ state: mode }) // body data type must match "Content-Type" header
+    body: JSON.stringify({ state: mode })
   });
   const data = await response.json();
   return data["state"];
