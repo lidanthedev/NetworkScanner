@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
 import './App.css';
 
 function App() {
   const [scannerState, setScannerState] = useState(false);
+  const stateBtn: HTMLButtonElement = document.getElementById("stateBtn") as HTMLButtonElement;
 
   useEffect(() => {
     const fetchScannerState = async () => {
-      const state = await toggleScanner();
+      const state = await getScannerState();
       setScannerState(state);
     };
 
@@ -17,9 +17,11 @@ function App() {
   return (
     <>
       <h1>Toggle Scanner</h1>
-      <button onClick={async () => {
-        const state = await toggleScanner();
+      <button id="stateBtn" onClick={async () => {
+        stateBtn.disabled = true;
+        const state = await setScanner(!scannerState);
         setScannerState(state);
+        stateBtn.disabled = false;
       }}>
       Scanner is now {scannerState ? "On" : "Off"}
     </button>
@@ -27,8 +29,14 @@ function App() {
   )
 }
 
-async function toggleScanner(): Promise<boolean> {
-  const response = await fetch('http://localhost:5000/toggle');
+async function setScanner(mode: boolean): Promise<boolean> {
+  const response = await fetch('http://localhost:5000/setState', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ state: mode }) // body data type must match "Content-Type" header
+  });
   const data = await response.json();
   return data["state"];
 }

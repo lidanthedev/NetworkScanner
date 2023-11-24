@@ -10,13 +10,18 @@ CORS(app)
 scanner = Scanner()
 
 
-@app.route("/toggle")
+@app.route("/setState", methods=["POST"])
 def toggle():
-    if scanner.state == True:
-        scanner.stop()
-    else:
-        scanner.start()
-    
+    data = request.get_json()
+    state = data["state"]
+
+    if state != scanner.state:
+        scanner.state = state
+        if scanner.state == True:
+            scanner.start()
+        else:
+            scanner.stop()
+
     return {"state": scanner.state}
 
 
