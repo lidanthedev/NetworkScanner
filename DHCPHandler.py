@@ -29,6 +29,7 @@ class DHCPHandler(AttackHandler):
                     print("ATTACK DETECTED!!!!!!")
             # save the mac address of the joined network if it's the first time joining it
             else:
+                print(f"ADD DHCP: {network_name} {better_packet.get_source_mac()}")
                 self.mac_table[network_name] = better_packet.get_source_mac()
 
 
