@@ -8,6 +8,7 @@ app = Flask(__name__)
 CORS(app)
 
 scanner = Scanner()
+scanner.start()
 
 
 @app.route("/setState", methods=["POST"])

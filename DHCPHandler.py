@@ -26,7 +26,7 @@ class DHCPHandler(AttackHandler):
                 # device that gave us the ack command the first time we joined it
                 # is not the same then there is an attack going on
                 if self.mac_table[network_name] != better_packet.get_source_mac():
-                    print("ATTACK DETECTED!!!!!!")
+                    print("DHCP ATTACK DETECTED!!!!!!")
             # save the mac address of the joined network if it's the first time joining it
             else:
                 print(f"ADD DHCP: {network_name} {better_packet.get_source_mac()}")
