@@ -4,6 +4,7 @@ import time
 
 from AttackHandler import AttackHandler
 
+
 class EvilTwinHandler(AttackHandler):
     TIME_TO_CHECK_EVILTWIN = 20
 
@@ -26,6 +27,9 @@ class EvilTwinHandler(AttackHandler):
                 print(f"Evil Twin Detected, networks that appear more than once:")
                 for network in duplicates:
                     print(f"\t{network}")
+
+    def protect_attack(self):
+        pass
 
     def get_wifi_networks(self):
         try:
