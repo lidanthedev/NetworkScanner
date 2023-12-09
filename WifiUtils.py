@@ -6,7 +6,7 @@ def get_current_ssid():
         result = subprocess.check_output(['iwgetid', '--raw'], stderr=subprocess.STDOUT, text=True)
         ssid = result.strip()
         return ssid
-    except:
+    except Exception as e:
         return "Ethernet"
 
 

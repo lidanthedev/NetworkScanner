@@ -10,6 +10,15 @@ CORS(app)
 scanner = Scanner()
 scanner.start()
 
+@app.route("/setAttackState", methods=["POST"])
+def toggle_attack_state():
+    data = request.get_json()
+    attack_id = data["attack_id"]
+    state = data["state"]
+
+    scanner.set_attack_state(attack_id, state)
+
+
 
 @app.route("/setState", methods=["POST"])
 def toggle():
@@ -22,7 +31,6 @@ def toggle():
             scanner.start()
         else:
             scanner.stop()
-
     return {"state": scanner.state}
 
 

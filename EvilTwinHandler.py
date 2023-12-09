@@ -10,6 +10,7 @@ class EvilTwinHandler(AttackHandler):
     TIME_TO_CHECK_EVILTWIN = 20
 
     def __init__(self):
+        super().__init__(AttackHandler.EVIL_TWIN_HANDLER_ID)
         self.time_since_last_check = time.perf_counter()
 
     def handle_packet(self, better_packet):
