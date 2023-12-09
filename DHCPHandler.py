@@ -4,6 +4,8 @@ from AttackHandler import AttackHandler
 import subprocess
 from scapy.layers.dhcp import DHCP
 
+import WifiUtils
+
 
 class DHCPHandler(AttackHandler):
     def __init__(self):
@@ -20,7 +22,7 @@ class DHCPHandler(AttackHandler):
             # connected to the network before trying to pull
             # the ssid since the function requires you being in it
             time.sleep(2)
-            network_name = self.get_current_ssid()
+            network_name = WifiUtils.get_current_ssid()
 
             if network_name in self.mac_table:
                 # if we already connected to this net work before and the mac of the
@@ -38,11 +40,3 @@ class DHCPHandler(AttackHandler):
 
     def is_packet_dhcp_ack(self, better_packet):
         return better_packet.packet[DHCP].options[0][1] == 5
-
-    def get_current_ssid(self):
-        try:
-            result = subprocess.check_output(['iwgetid', '--raw'], stderr=subprocess.STDOUT, text=True)
-            ssid = result.strip()
-            return ssid
-        except:
-            return "Ethernet"
