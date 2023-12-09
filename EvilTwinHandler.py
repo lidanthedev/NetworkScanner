@@ -3,6 +3,7 @@ import subprocess
 import time
 
 from AttackHandler import AttackHandler
+import WifiUtils
 
 
 class EvilTwinHandler(AttackHandler):
@@ -17,7 +18,7 @@ class EvilTwinHandler(AttackHandler):
         if time.perf_counter() - self.time_since_last_check > self.TIME_TO_CHECK_EVILTWIN:
             self.time_since_last_check = time.perf_counter()
 
-            current_networks = self.get_wifi_networks()
+            current_networks = WifiUtils.get_wifi_networks()
             # get all networks that appear with the same name more than once
             duplicates = [item for item, count in collections.Counter(current_networks).items() if count > 1]
             if "" in duplicates:
@@ -30,18 +31,3 @@ class EvilTwinHandler(AttackHandler):
 
     def protect_attack(self):
         pass
-
-    def get_wifi_networks(self):
-        try:
-            result = subprocess.run(['iwlist', 'scan'], capture_output=True, text=True)
-
-            if result.returncode == 0:
-                networks = [line.split(':')[1].strip() for line in result.stdout.split('\n') if 'ESSID' in line]
-                return networks
-            else:
-                print(f"Error in EvilTwin: {result.stderr} (Are you in Windows?)")
-                return None
-
-        except Exception as e:
-            print(f"An error occurred with EvilTwin: {e} (Are you in Windows?)")
-            return None
