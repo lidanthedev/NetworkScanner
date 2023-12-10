@@ -14,7 +14,6 @@ class Scanner:
 
     def __init__(self):
         self.handlers = [ARPHandler(), DHCPHandler(), EvilTwinHandler()]
-        self.attacks_state = {handler.handler_id: True for handler in self.handlers}
         self.sniffer = AsyncSniffer(prn=self.handle_packet)
         self.state = False
 
@@ -22,11 +21,14 @@ class Scanner:
         better_packet = PacketWrapper.to_better_packet(packet)
         if better_packet is not None:
             for handler in self.handlers:
-                if self.attacks_state[handler.handler_id]:
+                if handler.enabled:
                     handler.handle_packet(better_packet)
 
     def set_attack_state(self, id_attack, state):
-        self.attacks_state[id_attack] = state
+        for handler in self.handlers:
+            if handler.handler_id == id_attack:
+                handler.enabled = state
+                return
 
     def start(self):
         print("Scanner Started")

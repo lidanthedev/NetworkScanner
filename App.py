@@ -13,10 +13,11 @@ scanner.start()
 @app.route("/setAttackState", methods=["POST"])
 def toggle_attack_state():
     data = request.get_json()
-    attack_id = data["attack_id"]
+    attack_id = data["id"]
     state = data["state"]
 
     scanner.set_attack_state(attack_id, state)
+    return {"id": attack_id, "state": state}
 
 
 
@@ -37,6 +38,10 @@ def toggle():
 @app.route("/getState")
 def getState():
     return {"state": scanner.state}
+
+@app.route("/getAttacksState")
+def getAttacksState():
+    return [{"id": handler.handler_id, "state": handler.enabled} for handler in scanner.handlers]
 
 
 if __name__ == "__main__":
