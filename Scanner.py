@@ -1,6 +1,10 @@
+from scapy.layers.dns import DNS
+from scapy.layers.inet import IP, TCP
+
 import PacketWrapper
 from AttackHandler import AttackHandler
 from DHCPHandler import DHCPHandler
+from DNSHandler import DNSHandler
 from EvilTwinHandler import EvilTwinHandler
 from scapy.sendrecv import sniff
 from scapy.sendrecv import AsyncSniffer
@@ -13,7 +17,7 @@ class Scanner:
     state: bool
 
     def __init__(self):
-        self.handlers = [ARPHandler(), DHCPHandler(), EvilTwinHandler()]
+        self.handlers = [ARPHandler(), DHCPHandler(), EvilTwinHandler(), DNSHandler()]
         self.sniffer = AsyncSniffer(prn=self.handle_packet)
         self.state = False
 

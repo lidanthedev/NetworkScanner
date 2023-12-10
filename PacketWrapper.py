@@ -1,3 +1,4 @@
+from scapy.layers.dns import DNS
 from scapy.layers.l2 import Ether, ARP
 from scapy.layers.inet import IP, TCP
 from scapy.packet import Packet
@@ -58,20 +59,21 @@ class TCPPacket(IPPacket):
     def get_destination_port(self) -> int:
         return self.packet[TCP].dport
 
+
 class DHCPPacket(IPPacket):
+    DISCOVER = 1
+    OFFER = 2
+    REQUEST = 3
+    DECLINE = 4
+    ACK = 5
 
-        DISCOVER = 1
-        OFFER = 2
-        REQUEST = 3
-        DECLINE = 4
-        ACK = 5
+    def __str__(self):
+        return super().__str__() + f"DHCP:" \
+                                   f"  DHCP Type: {self.get_dhcp_type()}\n"
 
-        def __str__(self):
-            return super().__str__() + f"DHCP:" \
-                                f"  DHCP Type: {self.get_dhcp_type()}\n"
+    def get_dhcp_type(self) -> int:
+        return self.packet[DHCP].options[0][1]
 
-        def get_dhcp_type(self) -> int:
-            return self.packet[DHCP].options[0][1]
 
 class ARPPacket(MACPacket):
     def __str__(self):
@@ -97,6 +99,42 @@ class ARPReplyPacket(ARPPacket):
         return self.packet[ARP].hwsrc
 
 
+class DNSPacket(MACPacket):
+    TYPE_QUERY = "Query"
+    TYPE_ANSWER = "Answer"
+    TYPE_OTHER = "Other"
+
+    A_RECORD = 1
+
+    def __str__(self):
+        return super().__str__() + f"DNS:" \
+                                   f"  Domain Name: {self.get_domain_name()}\n"
+
+    def get_domain_name(self) -> str:
+        if self.packet[DNS].qd is not None:
+            return self.packet[DNS].qd.qname.decode("utf-8")
+        elif self.packet[DNS].an is not None:
+            return self.packet[DNS].an.rdata
+
+        return ""
+
+    def get_type(self) -> str:
+        if self.packet[DNS].an is not None:
+            return self.TYPE_ANSWER
+        elif self.packet[DNS].qd is not None:
+            return self.TYPE_QUERY
+
+        return self.TYPE_OTHER
+
+    def get_response(self) -> str:
+        if self.packet[DNS].an is not None:
+            for answer in self.packet[DNS].an:
+                if answer.type == self.A_RECORD:
+                    return answer.rdata
+
+        return ""
+
+
 def to_better_packet(packet):
     if packet.haslayer(DHCP) and packet.haslayer(Ether) and packet.haslayer(IP):
         return DHCPPacket(packet)
@@ -104,6 +142,8 @@ def to_better_packet(packet):
         return TCPPacket(packet)
     elif packet.haslayer(IP) and packet.haslayer(Ether):
         return IPPacket(packet)
+    elif packet.haslayer(DNS) and packet.haslayer(Ether):
+        return DNSPacket(packet)
     elif packet.haslayer(ARP) and packet.haslayer(Ether):
         if packet[ARP].op == ARP_REQUEST_CODE:
             return ARPPacket(packet)
