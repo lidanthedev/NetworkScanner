@@ -12,6 +12,7 @@ class ARPHandler(AttackHandler):
     arp_table: dict[str, str]
 
     def __init__(self):
+        super().__init__(AttackHandler.ARP_HANDLER_ID)
         self.arp_table = {}
 
         # run find_device_on_network in a thread

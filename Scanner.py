@@ -7,7 +7,6 @@ from scapy.sendrecv import AsyncSniffer
 
 from ARPHandler import ARPHandler
 
-
 class Scanner:
     handlers: list[AttackHandler]
     sniffer: AsyncSniffer
@@ -22,7 +21,14 @@ class Scanner:
         better_packet = PacketWrapper.to_better_packet(packet)
         if better_packet is not None:
             for handler in self.handlers:
-                handler.handle_packet(better_packet)
+                if handler.enabled:
+                    handler.handle_packet(better_packet)
+
+    def set_attack_state(self, id_attack, state):
+        for handler in self.handlers:
+            if handler.handler_id == id_attack:
+                handler.enabled = state
+                return
 
     def start(self):
         print("Scanner Started")

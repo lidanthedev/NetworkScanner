@@ -6,9 +6,10 @@ from scapy.layers.dhcp import DHCP
 
 import WifiUtils
 
-
 class DHCPHandler(AttackHandler):
+
     def __init__(self):
+        super().__init__(AttackHandler.DHCP_HANDLER_ID)
         self.mac_table = {}
 
     def handle_packet(self, better_packet):
