@@ -15,7 +15,7 @@ class DNSHandler(AttackHandler):
 
     def __init__(self):
         super().__init__(AttackHandler.DNS_HANDLER_ID)
-        self.dns_table = {"dns.google": "8.8.8.8"}
+        self.dns_table = {}
 
     def handle_packet(self, better_packet: DNSPacket):
         if isinstance(better_packet, DNSPacket):
@@ -34,25 +34,28 @@ class DNSHandler(AttackHandler):
 
     def send_query_to_google(self, domain):
         result_ip = ""
-        res = requests.get(GOOGLE_DNS, params={"name": domain, "type": "A"})
-        if res.status_code == RESULT_OK:
-            data = res.json()
-            addresses = []
-            if "Answer" in data:
-                for answer in data["Answer"]:
-                    if answer["type"] == DNSPacket.A_RECORD:
-                        addresses.append(answer["data"])
-            if len(addresses) > 0:
-                result_ips = ", ".join(addresses)
-                self.dns_table[domain] = addresses
-                print("GOOGLE DNS: " + domain + " -> " + result_ips)
-        else:
-            print("GOOGLE DNS Error: " + str(res.status_code))
+        try:
+            res = requests.get(GOOGLE_DNS, params={"name": domain, "type": "A"})
+            if res.status_code == RESULT_OK:
+                data = res.json()
+                addresses = []
+                if "Answer" in data:
+                    for answer in data["Answer"]:
+                        if answer["type"] == DNSPacket.A_RECORD:
+                            addresses.append(answer["data"])
+                if len(addresses) > 0:
+                    result_ips = ", ".join(addresses)
+                    self.dns_table[domain] = addresses
+                    print("GOOGLE DNS: " + domain + " -> " + result_ips)
+            else:
+                print("GOOGLE DNS Error: " + str(res.status_code))
+        except Exception as error:
+            print("GOOGLE DNS Error: " + str(error))
         return result_ip
 
     def handle_response(self, better_packet):
         domain = better_packet.get_domain_name()
-        if better_packet.get_domain_name() not in self.dns_table:
+        if domain not in self.dns_table:
             return
         response = better_packet.get_response()
         if response == "":
@@ -60,4 +63,3 @@ class DNSHandler(AttackHandler):
         if response not in self.dns_table[domain]:
             print(
                 f'DNS SPOOFING DETECTED: {domain} has multiple IP addresses: {response} and {self.dns_table[domain]}')
-
