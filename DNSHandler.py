@@ -11,11 +11,11 @@ GOOGLE_DNS = "https://dns.google/resolve"
 
 
 class DNSHandler(AttackHandler):
-    dns_table: dict
+    dns_table: dict[str, list[str]]
 
     def __init__(self):
         super().__init__(AttackHandler.DNS_HANDLER_ID)
-        self.dns_table = {}
+        self.dns_table = {"dns.google": "8.8.8.8"}
 
     def handle_packet(self, better_packet: DNSPacket):
         if isinstance(better_packet, DNSPacket):
@@ -37,10 +37,15 @@ class DNSHandler(AttackHandler):
         res = requests.get(GOOGLE_DNS, params={"name": domain, "type": "A"})
         if res.status_code == RESULT_OK:
             data = res.json()
+            addresses = []
             if "Answer" in data:
-                result_ip = data["Answer"][0]["data"]
-                self.dns_table[domain] = result_ip
-                print("ADD DNS: " + domain + " -> " + result_ip)
+                for answer in data["Answer"]:
+                    if answer["type"] == DNSPacket.A_RECORD:
+                        addresses.append(answer["data"])
+            if len(addresses) > 0:
+                result_ips = ", ".join(addresses)
+                self.dns_table[domain] = addresses
+                print("GOOGLE DNS: " + domain + " -> " + result_ips)
         else:
             print("GOOGLE DNS Error: " + str(res.status_code))
         return result_ip
@@ -51,7 +56,8 @@ class DNSHandler(AttackHandler):
             return
         response = better_packet.get_response()
         if response == "":
-            response = self.dns_table[domain]
-        if self.dns_table[domain] != response:
+            response = self.dns_table[domain][0]
+        if response not in self.dns_table[domain]:
             print(
-                "DNS Spoofing Detected! " + domain + " -> " + response + " (should be " + self.dns_table[domain] + ")")
+                f'DNS SPOOFING DETECTED: {domain} has multiple IP addresses: {response} and {self.dns_table[domain]}')
+
