@@ -8,6 +8,8 @@ import WifiUtils
 
 class EvilTwinHandler(AttackHandler):
     TIME_TO_CHECK_EVILTWIN = 20
+    MIN_FREQUENCY = 2
+    MAX_FREQUENCY = 3
 
     def __init__(self):
         super().__init__(AttackHandler.EVIL_TWIN_HANDLER_ID)
@@ -19,7 +21,7 @@ class EvilTwinHandler(AttackHandler):
         if time.perf_counter() - self.time_since_last_check > self.TIME_TO_CHECK_EVILTWIN:
             self.time_since_last_check = time.perf_counter()
 
-            current_networks = WifiUtils.get_wifi_networks()
+            current_networks = WifiUtils.get_wifi_networks(EvilTwinHandler.MIN_FREQUENCY, EvilTwinHandler.MAX_FREQUENCY)
             # get all networks that appear with the same name more than once
             duplicates = [item for item, count in collections.Counter(current_networks).items() if count > 1]
             if "" in duplicates:
