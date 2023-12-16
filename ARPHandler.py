@@ -17,7 +17,7 @@ class ARPHandler(AttackHandler):
 
         # run find_device_on_network in a thread
 
-        scanner_thread = threading.Thread(target=self.find_devices_on_network)
+        scanner_thread = threading.Thread(target=self.find_devices_on_network, daemon=True)
         scanner_thread.start()
 
     def handle_packet(self, better_packet: MACPacket):

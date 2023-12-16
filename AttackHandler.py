@@ -7,6 +7,7 @@ class AttackHandler(ABC):
     EVIL_TWIN_HANDLER_ID = "Evil Twin"
     ARP_HANDLER_ID = "ARP Poisoning"
     DNS_HANDLER_ID = "DNS Poisoning"
+    PORT_HANDLER_ID = "Port Scan"
 
     def __init__(self, handler_id):
         self.handler_id = handler_id
