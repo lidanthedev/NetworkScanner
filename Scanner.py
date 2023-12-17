@@ -10,6 +10,8 @@ from scapy.sendrecv import sniff
 from scapy.sendrecv import AsyncSniffer
 
 from ARPHandler import ARPHandler
+from Portscan import PortscanHandler
+
 
 class Scanner:
     handlers: list[AttackHandler]
@@ -17,7 +19,7 @@ class Scanner:
     state: bool
 
     def __init__(self):
-        self.handlers = [ARPHandler(), DHCPHandler(), EvilTwinHandler(), DNSHandler()]
+        self.handlers = [ARPHandler(), DHCPHandler(), EvilTwinHandler(), DNSHandler(), PortscanHandler()]
         self.sniffer = AsyncSniffer(prn=self.handle_packet)
         self.state = False
 
