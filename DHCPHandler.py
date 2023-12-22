@@ -31,6 +31,7 @@ class DHCPHandler(AttackHandler):
                 # is not the same then there is an attack going on
                 if self.mac_table[network_name] != better_packet.get_source_mac():
                     print("DHCP ATTACK DETECTED!!!!!!")
+                    self.notify(f"MAC doesn't match {self.mac_table[network_name]} with {better_packet.get_source_mac()}")
             # save the mac address of the joined network if it's the first time joining it
             else:
                 print(f"ADD DHCP: {network_name} {better_packet.get_source_mac()}")

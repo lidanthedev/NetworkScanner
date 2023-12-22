@@ -41,7 +41,7 @@
   color: #888;
 }
 
- 
+
 body {
   margin: 0;
   display: flex;
@@ -51,7 +51,7 @@ body {
   /* for smooth transition*/
   transition: 0.5s ease-in-out;
 }
- 
+
 * {
   box-sizing: border-box;
 }
@@ -65,7 +65,7 @@ body {
   cursor: pointer;
   z-index: 2;
 }
- 
+
 /* CSS for switch when "on"*/
 .toggleSwitch.on {
   background-color: #1aad66;
@@ -73,19 +73,19 @@ body {
   /* for smooth transition*/
   transition: 0.5s ease-in-out;
 }
- 
+
 /*CSS for switch when "off"*/
 .toggleSwitch.off {
   background-color: #dddddd;
   justify-content: flex-start;
 }
- 
+
 .toggleSwitch div {
   width: 80px;
   height: 80px;
   border-radius: 100%;
 }
- 
+
 img {
   width: 80px;
   height: 80px;

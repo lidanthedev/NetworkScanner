@@ -46,6 +46,14 @@ class Scanner:
         self.state = False
         self.sniffer.stop()
 
+    def get_notifications(self):
+        notifications = []
+        for handler in self.handlers:
+            if handler.enabled:
+                notifications += handler.notifications
+                handler.notifications = []
+        return notifications
+
 
 def main():
     scanner = Scanner()

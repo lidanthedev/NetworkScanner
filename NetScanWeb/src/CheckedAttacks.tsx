@@ -7,7 +7,7 @@ export default function CheckedAttacks() {
   useEffect(() => {
     fetch('http://localhost:5000/getAttacksState').then(response => response.json()).then(data => {
       const newCheckedAttacks = data.map((attack: any) => (
-        <label style={{display: "flex"}}>
+        <label style={{display: "flex"}} key={attack["id"]}>
           <input
             type="checkbox"
             defaultChecked={attack["state"]}
