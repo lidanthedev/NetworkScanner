@@ -17,6 +17,7 @@ def toggle_attack_state():
     state = data["state"]
 
     scanner.set_attack_state(attack_id, state)
+    print(f"Attack {attack_id} state set to {state}")
     return {"id": attack_id, "state": state}
 
 
