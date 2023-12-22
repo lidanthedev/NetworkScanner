@@ -42,6 +42,7 @@ class PortscanHandler(AttackHandler):
                 if time.time() - self.time_since_last_alert > 60:
                     self.time_since_last_alert = time.time()
                     print("Portscan detected!")
+                    self.save_attack(better_packet, False)
                 self.counter = 0
 
     def protect_attack(self):
