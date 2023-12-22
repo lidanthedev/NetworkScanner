@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import './App.css';
 import CheckedAttacks from "./CheckedAttacks.tsx";
+import NotificationsSender from "./NotificationsSender.tsx";
 
 function App() {
   const [scannerState, setScannerState] = useState(false);
@@ -28,6 +29,7 @@ function App() {
       </button>
 
       <CheckedAttacks />
+      <NotificationsSender />
     </div>
   );
 }

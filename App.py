@@ -44,6 +44,9 @@ def getState():
 def getAttacksState():
     return [{"id": handler.handler_id, "state": handler.enabled} for handler in scanner.handlers]
 
+@app.route("/getNotifications")
+def getNotifications():
+    return scanner.get_notifications()
 
 if __name__ == "__main__":
     app.run()

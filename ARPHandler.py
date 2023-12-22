@@ -34,6 +34,9 @@ class ARPHandler(AttackHandler):
                 print(
                     f"DETECTED ARP POISONING: IP {ip} has multiple MAC addresses: {self.arp_table[ip]} and {arp_packet.get_response_mac()}"
                 )
+                self.notify(
+                    f"IP {ip} has multiple MAC addresses: {self.arp_table[ip]} and {arp_packet.get_response_mac()}"
+                )
 
     def protect_attack(self):
         print("PROTECT ARP!!!!")
