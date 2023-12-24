@@ -17,6 +17,7 @@ def toggle_attack_state():
     state = data["state"]
 
     scanner.set_attack_state(attack_id, state)
+    print(f"Attack {attack_id} state set to {state}")
     return {"id": attack_id, "state": state}
 
 
@@ -43,6 +44,9 @@ def getState():
 def getAttacksState():
     return [{"id": handler.handler_id, "state": handler.enabled} for handler in scanner.handlers]
 
+@app.route("/getNotifications")
+def getNotifications():
+    return scanner.get_notifications()
 
 if __name__ == "__main__":
     app.run()

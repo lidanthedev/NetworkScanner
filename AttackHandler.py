@@ -1,17 +1,22 @@
+import random
+import time
+import uuid
 from abc import ABC, abstractmethod
 import JsonUtils
 import WifiUtils
 import time
 
 class AttackHandler(ABC):
-
     DHCP_HANDLER_ID = "DHCP SPOOFING"
     EVIL_TWIN_HANDLER_ID = "Evil Twin"
     ARP_HANDLER_ID = "ARP Poisoning"
     DNS_HANDLER_ID = "DNS Poisoning"
     PORT_HANDLER_ID = "Port Scan"
 
+    notifications: list[dict]
+
     def __init__(self, handler_id):
+        self.notifications = []
         self.handler_id = handler_id
         self.enabled = True
 
@@ -35,3 +40,10 @@ class AttackHandler(ABC):
                                     "Date": time.strftime("%d/%m/%Y"),
                                     "Is_Defended": is_defended})
 
+    def notify(self, body, title=None):
+        if title is None:
+            title = f"{self.handler_id} Detected!"
+        notification = {"id": str(uuid.uuid4()), "handler_id": self.handler_id, "title": title, "body": body,
+                        "time": int(time.time() * 1000)}
+        self.notifications.append(notification)
+        return notification

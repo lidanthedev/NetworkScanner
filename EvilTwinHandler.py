@@ -32,6 +32,7 @@ class EvilTwinHandler(AttackHandler):
                 self.save_attack(better_packet, False)
                 for network in duplicates:
                     print(f"\t{network}")
+                self.notify(f"networks that appear more than once: {duplicates}")
 
     def protect_attack(self):
         pass

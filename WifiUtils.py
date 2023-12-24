@@ -13,7 +13,7 @@ def get_current_ssid():
 def get_wifi_networks(min_frequency, max_frequency):
     try:
         result = subprocess.run(['iwlist', 'scan'], capture_output=True, text=True)
-        print(result.stdout)
+        # print(result.stdout)
         if result.returncode == 0:
             networks = []
 
