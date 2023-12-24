@@ -1,20 +1,20 @@
 import json
-import os
-import datetime
+import os.path
 
-DIR = "attacks"
+FILE_NAME = "attacks"
 
 def save_attack_data(data: dict[str, str]):
-    file_name = datetime.datetime.now().strftime('%d_%m_%Y_%H_%M_%S') + "_0"
+    if not os.path.exists(f"./{FILE_NAME}.json"):
+        with open(f"./{FILE_NAME}.json", "w") as f:
+            json.dump([], f, indent=4)
 
-    files_exists_amount = 0
-    # if file already exists add a number to the end of the file name
-    while os.path.exists(f"./{DIR}/{file_name}.json"):
-        # get file name till files_amounts
-        file_name = file_name[:file_name.rfind("_")]
+    with open(f"./{FILE_NAME}.json", "r") as f:
+        attacks = json.load(f)
 
-        file_name += f"_{files_exists_amount}"
-        files_exists_amount += 1
+    # convert data to list if not
+    if type(attacks) is dict:
+        attacks = [attacks]
 
-    with open(f"./{DIR}/{file_name}.json", "w") as f:
-        json.dump(data, f, indent=4)
+    attacks.append(data)
+    with open(f"./{FILE_NAME}.json", "w") as f:
+        json.dump(attacks, f, indent=4)
