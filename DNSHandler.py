@@ -63,5 +63,6 @@ class DNSHandler(AttackHandler):
         if response not in self.dns_table[domain]:
             print(
                 f'DNS SPOOFING DETECTED: {domain} has multiple IP addresses: {response} and {self.dns_table[domain]}')
+            self.save_attack(better_packet, False)
             self.notify(
                 f'{domain} has multiple IP addresses: {response} and {self.dns_table[domain]}')
