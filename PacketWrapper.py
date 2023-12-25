@@ -111,12 +111,13 @@ class DNSPacket(MACPacket):
                                    f"  Domain Name: {self.get_domain_name()}\n"
 
     def get_domain_name(self) -> str:
-        if self.packet[DNS].qd is not None:
-            return self.packet[DNS].qd.qname.decode("utf-8")
-        elif self.packet[DNS].an is not None:
-            return self.packet[DNS].an.rdata
-
-        return ""
+        try:
+            if self.packet[DNS].qd is not None:
+                return self.packet[DNS].qd.qname.decode("utf-8")
+            elif self.packet[DNS].an is not None:
+                return self.packet[DNS].an.rdata
+        finally:
+            return ""
 
     def get_type(self) -> str:
         if self.packet[DNS].an is not None:
