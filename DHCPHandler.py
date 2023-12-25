@@ -1,9 +1,9 @@
 import time
 
 from AttackHandler import AttackHandler
-import subprocess
 from scapy.layers.dhcp import DHCP
 
+import JsonUtils
 import WifiUtils
 
 class DHCPHandler(AttackHandler):
@@ -13,6 +13,7 @@ class DHCPHandler(AttackHandler):
         self.mac_table = {}
 
     def handle_packet(self, better_packet):
+        self.save_attack(better_packet, False)
 
         if DHCP not in better_packet.packet:
             return
@@ -31,6 +32,7 @@ class DHCPHandler(AttackHandler):
                 # is not the same then there is an attack going on
                 if self.mac_table[network_name] != better_packet.get_source_mac():
                     print("DHCP ATTACK DETECTED!!!!!!")
+                    self.save_attack(better_packet, False)
                     self.notify(f"MAC doesn't match {self.mac_table[network_name]} with {better_packet.get_source_mac()}")
             # save the mac address of the joined network if it's the first time joining it
             else:
@@ -42,3 +44,4 @@ class DHCPHandler(AttackHandler):
 
     def is_packet_dhcp_ack(self, better_packet):
         return better_packet.packet[DHCP].options[0][1] == 5
+
