@@ -13,8 +13,6 @@ class DHCPHandler(AttackHandler):
         self.mac_table = {}
 
     def handle_packet(self, better_packet):
-        self.save_attack(better_packet, False)
-
         if DHCP not in better_packet.packet:
             return
 
