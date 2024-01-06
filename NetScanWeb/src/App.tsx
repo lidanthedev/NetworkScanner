@@ -46,10 +46,10 @@ async function setScanner(mode: boolean): Promise<boolean> {
   return data["state"];
 }
 
-async function getScannerState(): Promise<boolean> {
-  const response = await fetch('http://localhost:5000/getState');
-  const data = await response.json();
-  return data["state"];
-}
+    async function getScannerState(): Promise<boolean> {
+      const response = await fetch('http://localhost:5000/getState');
+      const data = await response.json();
+      return data["state"];
+    }
 
 export default App;

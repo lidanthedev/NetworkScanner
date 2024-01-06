@@ -40,6 +40,7 @@ class DHCPHandler(AttackHandler):
     def protect_attack(self):
         pass
 
+
     def is_packet_dhcp_ack(self, better_packet):
         return better_packet.packet[DHCP].options[0][1] == 5
 

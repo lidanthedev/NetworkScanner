@@ -1,5 +1,5 @@
 from scapy.layers.dns import DNS
-from scapy.layers.inet import IP, TCP
+from scapy.layers.inet import IP, TCP, Ether
 
 import PacketWrapper
 from AttackHandler import AttackHandler
@@ -11,6 +11,7 @@ from scapy.sendrecv import AsyncSniffer
 
 from ARPHandler import ARPHandler
 from Portscan import PortscanHandler
+from netfilterqueue import NetfilterQueue
 
 
 class Scanner:
@@ -20,11 +21,12 @@ class Scanner:
 
     def __init__(self):
         self.handlers = [ARPHandler(), DHCPHandler(), EvilTwinHandler(), DNSHandler(), PortscanHandler()]
-        self.sniffer = AsyncSniffer(prn=self.handle_packet)
+        self.queue = netfilterqueue.NetfilterQueue()
         self.state = False
 
-    def handle_packet(self, packet):
-        better_packet = PacketWrapper.to_better_packet(packet)
+    def handle_packet(self, nfq_packet):
+        packet = Ether(nfq_packet.get_payload())
+        better_packet = PacketWrapper.to_better_packet(packet, nfq_packet)
         if better_packet is not None:
             for handler in self.handlers:
                 if handler.enabled:
@@ -39,12 +41,12 @@ class Scanner:
     def start(self):
         print("Scanner Started")
         self.state = True
-        self.sniffer.start()
+        self.queue.bind(0, handle_packet)
 
     def stop(self):
         print("Scanner Stopped")
         self.state = False
-        self.sniffer.stop()
+        self.queue.unbind()
 
     def get_notifications(self):
         notifications = []
@@ -58,6 +60,7 @@ class Scanner:
 def main():
     scanner = Scanner()
     scanner.start()
+
 
     while True:
         pass
