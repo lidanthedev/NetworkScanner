@@ -6,6 +6,7 @@ import JsonUtils
 import WifiUtils
 import time
 
+
 class AttackHandler(ABC):
     DHCP_HANDLER_ID = "DHCP SPOOFING"
     EVIL_TWIN_HANDLER_ID = "Evil Twin"
@@ -32,13 +33,16 @@ class AttackHandler(ABC):
     # when attacks are defended, this function will be called when the attack is detected
     # to fill IS_DEFENDED field
     def save_attack(self, better_packet, is_defended):
-        JsonUtils.save_attack_data({"Attack_name": self.handler_id,
-                                    "IP": better_packet.get_source_ip(),
-                                    "MAC": better_packet.get_source_mac(),
-                                    "WIFI": WifiUtils.get_current_ssid(),
-                                    "Time": time.strftime("%H:%M:%S"),
-                                    "Date": time.strftime("%d/%m/%Y"),
-                                    "Is_Defended": is_defended})
+        try:
+            JsonUtils.save_attack_data({"Attack_name": self.handler_id,
+                                        "IP": better_packet.get_source_ip(),
+                                        "MAC": better_packet.get_source_mac(),
+                                        "WIFI": WifiUtils.get_current_ssid(),
+                                        "Time": time.strftime("%H:%M:%S"),
+                                        "Date": time.strftime("%d/%m/%Y"),
+                                        "Is_Defended": is_defended})
+        except:
+            print("Error saving attack data")
 
     def notify(self, body, title=None):
         if title is None:
