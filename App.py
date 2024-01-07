@@ -1,3 +1,5 @@
+import json
+
 from flask import Flask
 from flask import request
 from flask_cors import CORS
@@ -10,6 +12,7 @@ CORS(app)
 scanner = Scanner()
 scanner.start()
 
+
 @app.route("/setAttackState", methods=["POST"])
 def toggle_attack_state():
     data = request.get_json()
@@ -19,7 +22,6 @@ def toggle_attack_state():
     scanner.set_attack_state(attack_id, state)
     print(f"Attack {attack_id} state set to {state}")
     return {"id": attack_id, "state": state}
-
 
 
 @app.route("/setState", methods=["POST"])
@@ -37,16 +39,28 @@ def toggle():
 
 
 @app.route("/getState")
-def getState():
+def get_state():
     return {"state": scanner.state}
 
+
 @app.route("/getAttacksState")
-def getAttacksState():
+def get_attacks_state():
     return [{"id": handler.handler_id, "state": handler.enabled} for handler in scanner.handlers]
 
+
 @app.route("/getNotifications")
-def getNotifications():
+def get_notifications():
     return scanner.get_notifications()
+
+
+@app.route("/getAttacks")
+def get_attacks():
+    try:
+        with open("attacks.json", "r") as f:
+            return json.loads(f.read())
+    except FileNotFoundError:
+        return []
+
 
 if __name__ == "__main__":
     app.run()

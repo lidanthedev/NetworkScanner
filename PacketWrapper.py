@@ -115,8 +115,8 @@ class DNSPacket(MACPacket):
             if self.packet[DNS].qd is not None:
                 return self.packet[DNS].qd.qname.decode("utf-8")
             elif self.packet[DNS].an is not None:
-                return self.packet[DNS].an.rdata
-        finally:
+                return self.packet[DNS].an.rdata[0].decode("utf-8")
+        except:
             return ""
 
     def get_type(self) -> str:
@@ -141,10 +141,10 @@ def to_better_packet(packet):
         return DHCPPacket(packet)
     if packet.haslayer(TCP) and packet.haslayer(IP) and packet.haslayer(Ether):
         return TCPPacket(packet)
-    elif packet.haslayer(IP) and packet.haslayer(Ether):
-        return IPPacket(packet)
     elif packet.haslayer(DNS) and packet.haslayer(Ether):
         return DNSPacket(packet)
+    elif packet.haslayer(IP) and packet.haslayer(Ether):
+        return IPPacket(packet)
     elif packet.haslayer(ARP) and packet.haslayer(Ether):
         if packet[ARP].op == ARP_REQUEST_CODE:
             return ARPPacket(packet)
