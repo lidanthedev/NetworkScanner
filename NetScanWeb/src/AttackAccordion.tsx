@@ -5,7 +5,7 @@ import AccordionDetails from "@mui/material/AccordionDetails";
 import Accordion from "@mui/material/Accordion";
 import * as React from "react";
 
-interface AttackData {
+export interface AttackData {
   Attack_name: string,
   Date: string,
   IP: string,
@@ -51,7 +51,7 @@ export default function AttackAccordion(props: AttackAccordionProps) {
           WIFI Name: {attackData.WIFI}
         </Typography>
         <Typography>
-          Is Defended: {attackData.Is_Defended}
+          Is Defended: {attackData.Is_Defended.toString()}
         </Typography>
       </AccordionDetails>
     </Accordion>

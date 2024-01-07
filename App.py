@@ -55,8 +55,11 @@ def get_notifications():
 
 @app.route("/getAttacks")
 def get_attacks():
-    with open("attacks.json", "r") as f:
-        return json.loads(f.read())
+    try:
+        with open("attacks.json", "r") as f:
+            return json.loads(f.read())
+    except FileNotFoundError:
+        return []
 
 
 if __name__ == "__main__":

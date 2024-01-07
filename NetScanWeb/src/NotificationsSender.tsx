@@ -1,10 +1,11 @@
 import {useState} from "react";
 
-const checkPermission = () => {
+const checkIfNotificationExists = () => {
   if (!("Notification" in window)) {
-    alert("This browser does not support desktop notification");
-    throw new Error("This browser does not support desktop notification");
+    // alert("This browser does not support desktop notification");
+    return false;
   }
+  return true;
 }
 
 async function requestNotificationPermission() {
@@ -17,25 +18,30 @@ async function requestNotificationPermission() {
   }
 }
 
-checkPermission();
-
-setInterval(() => {
-  if (Notification.permission !== "granted") {
-    return;
-  }
-  fetch('http://localhost:5000/getNotifications').then(response => response.json()).then(data => {
-    data.forEach((notification: any) => {
-      new Notification(notification["title"], {
-        body: notification["body"]
+if (checkIfNotificationExists()) {
+  setInterval(() => {
+    if (Notification.permission !== "granted") {
+      return;
+    }
+    fetch('http://localhost:5000/getNotifications').then(response => response.json()).then(data => {
+      data.forEach((notification: any) => {
+        new Notification(notification["title"], {
+          body: notification["body"]
+        });
+        console.log(notification)
       });
-      console.log(notification)
-    });
-  })
-}, 5000);
+    })
+  }, 5000);
+}
 
 
 
 export default function NotificationsSender() {
+  if (!checkIfNotificationExists()) {
+    return <div>Notifications are not supported</div>
+  }
+
+
   const [mode, setMode] = useState("");
 
   let action = <button onClick={
@@ -54,4 +60,6 @@ export default function NotificationsSender() {
       Notifications: {action} {mode}
     </div>
   )
+
+
 }

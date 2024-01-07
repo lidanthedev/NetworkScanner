@@ -29,7 +29,8 @@ function App() {
   return (
     <ThemeProvider theme={darkTheme}>
       <CssBaseline/>
-      <AttackAccordion attackData={dummyAttackData} expanded={true} id={'hello'} handleChange={panel => event => {}}/>
+      <Scanner/>
+      <AttacksAccordions/>
     </ThemeProvider>
   )
 }
