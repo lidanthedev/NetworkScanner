@@ -1,6 +1,7 @@
 import multiprocessing
 import threading
 
+import netfilterqueue
 import scapy.layers.http
 
 from scapy.layers.dns import DNS
@@ -35,15 +36,18 @@ class Scanner:
         self.queue_proc = None
         self.state = False
 
-    def handle_packet(self, nfq_packet):
-        scapy_packet = Ether(nfq_packet.get_payload())
+    def handle_packet(self, nfq_packet: netfilterqueue.Packet):
+        scapy_packet = IP(nfq_packet.get_payload())
 
+        # print(scapy_packet.summary())
         better_packet = PacketWrapper.to_better_packet(scapy_packet, nfq_packet)
+        # print(better_packet)
         if better_packet is not None:
             for handler in self.handlers:
                 if handler.enabled:
                     handler.handle_packet(better_packet)
 
+        # print(scapy_packet.summary())
         nfq_packet.accept()
 
     def set_attack_state(self, id_attack, state):
@@ -57,14 +61,13 @@ class Scanner:
         self.state = True
         iptablesUtils.add_ip_table(self.QUEUE_NUM)
         self.queue.bind(self.QUEUE_NUM, self.handle_packet)
-        self.queue_proc = multiprocessing.Process(target=self.queue.run)
+        self.queue_proc = threading.Thread(target=self.queue.run, daemon=True)
         self.queue_proc.start()
 
     def stop(self):
         print("Scanner Stopped")
         self.state = False
         self.queue.unbind()
-        self.queue_proc.terminate()
         iptablesUtils.remove_ip_table(self.QUEUE_NUM)
 
     def get_notifications(self):

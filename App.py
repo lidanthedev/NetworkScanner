@@ -1,4 +1,4 @@
-import multiprocessing
+import atexit
 
 from flask import Flask
 from flask import request
@@ -13,6 +13,7 @@ CORS(app, supports_credentials=True)
 scanner = Scanner()
 scanner.start()
 
+
 @app.route("/setAttackState", methods=["POST"])
 def toggle_attack_state():
     data = request.get_json()
@@ -22,7 +23,6 @@ def toggle_attack_state():
     scanner.set_attack_state(attack_id, state)
     print(f"Attack {attack_id} state set to {state}")
     return {"id": attack_id, "state": state}
-
 
 
 @app.route("/setState", methods=["POST"])
@@ -43,13 +43,21 @@ def toggle():
 def getState():
     return {"state": scanner.state}
 
+
 @app.route("/getAttacksState")
 def getAttacksState():
     return [{"id": handler.handler_id, "state": handler.enabled} for handler in scanner.handlers]
+
 
 @app.route("/getNotifications")
 def getNotifications():
     return scanner.get_notifications()
 
+
+def exit_handler():
+    scanner.stop()
+
+
 if __name__ == "__main__":
+    atexit.register(exit_handler)
     app.run()

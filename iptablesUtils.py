@@ -1,11 +1,42 @@
 import subprocess
+import iptc
+
 
 def add_ip_table(id_table):
-    iptables_cmd = f"sudo iptables -A INPUT -j NFQUEUE --queue-num {id_table}"
-    print(f"Initiating an IP table with id - {id_table}")
-    subprocess.run(iptables_cmd, shell=True, check=True)
+    # Create a new rule
+    rule = iptc.Rule()
+
+    # Create a target for the rule
+    target = iptc.Target(rule, "NFQUEUE")
+
+    # Set the queue number to the target
+    target.set_parameter("queue-num", str(id_table))
+
+    # Set the rule's target
+    rule.target = target
+
+    # Get the "INPUT" chain
+    chain = iptc.Chain(iptc.Table(iptc.Table.FILTER), "INPUT")
+
+    # Insert the rule into the chain
+    chain.insert_rule(rule)
+
 
 def remove_ip_table(id_table):
-    iptables_cmd = f"sudo iptables -D INPUT -j NFQUEUE --queue-num {id_table}"
-    print(f"Removing an IP table with id - {id_table}")
-    subprocess.run(iptables_cmd, shell=True, check=True)
+    # Create a new rule
+    rule = iptc.Rule()
+
+    # Create a target for the rule
+    target = iptc.Target(rule, "NFQUEUE")
+
+    # Set the queue number to the target
+    target.set_parameter("queue-num", str(id_table))
+
+    # Set the rule's target
+    rule.target = target
+
+    # Get the "INPUT" chain
+    chain = iptc.Chain(iptc.Table(iptc.Table.FILTER), "INPUT")
+
+    # Delete the rule from the chain
+    chain.delete_rule(rule)

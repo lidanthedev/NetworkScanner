@@ -55,6 +55,5 @@ class PortscanHandler(AttackHandler):
                     print(f"Portscan detected from ip {better_packet.get_source_ip()}!")
                     self.notify(f"ip {better_packet.get_source_ip()} is scanning ports!")
 
-
     def protect_attack(self, better_packet):
         pass

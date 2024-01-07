@@ -13,7 +13,7 @@ class DHCPHandler(AttackHandler):
         self.mac_table = {}
 
     def handle_packet(self, better_packet):
-        if DHCP not in better_packet.scapy_packet:
+        if DHCP not in better_packet.packet:
             return
 
         # if joined a new network
