@@ -25,7 +25,7 @@ class AttackHandler(ABC):
         pass
 
     @abstractmethod
-    def protect_attack(self):
+    def protect_attack(self, better_packet):
         pass
 
     # NOTE: currently because we have no defenses, this function will be called after detection,

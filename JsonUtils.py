@@ -3,6 +3,7 @@ import os.path
 
 FILE_NAME = "attacks"
 
+
 def save_attack_data(data: dict[str, str]):
     if not os.path.exists(f"./{FILE_NAME}.json"):
         with open(f"./{FILE_NAME}.json", "w") as f:

@@ -24,7 +24,7 @@ class DNSHandler(AttackHandler):
             elif better_packet.get_type() == DNSPacket.TYPE_ANSWER:
                 self.handle_response(better_packet)
 
-    def protect_attack(self):
+    def protect_attack(self, better_packet):
         pass
 
     def handle_query(self, better_packet: DNSPacket):

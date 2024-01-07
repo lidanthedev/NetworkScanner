@@ -14,9 +14,9 @@ ARP_REQUEST_CODE = 1
 @dataclasses.dataclass
 class MACPacket:
     scapy_packet: Packet
-    nfq_packet: netfilterqueue.packet
+    nfq_packet: netfilterqueue.Packet
 
-    def __init__(self, scapy_packet: Packet, nfq_packet: netfilterqueue.packet):
+    def __init__(self, scapy_packet: Packet, nfq_packet: netfilterqueue.Packet):
         self.scapy_packet = scapy_packet
         self.nfq_packet = nfq_packet
 
@@ -28,7 +28,7 @@ class MACPacket:
     def get_scapy_packet(self) -> Packet:
         return self.scapy_packet
 
-    def get_nfq_packet(self) -> netfilterqueue.packet:
+    def get_nfq_packet(self) -> netfilterqueue.Packet:
         return self.nfq_packet
 
     def get_source_mac(self) -> str:
