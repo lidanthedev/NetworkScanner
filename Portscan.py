@@ -17,14 +17,16 @@ def is_syn_packet(packet):
 
 
 class PortscanHandler(AttackHandler):
-    ports: list[int]
+    ip_ports_map: dict[str, list[int]]
+    blacklisted_ips: list[str]
     time_since_last_check: float
     time_since_last_alert: float
     user_ip: str
 
     def __init__(self):
-        super().__init__(AttackHandler.PORT_HANDLER_ID)
-        self.ports = []
+        super().__init__(AttackHandler.PORT_HANDLER_ID, AttackHandler.NFQUEUE_HANDLER_TYPE)
+        self.ip_ports_map = {}
+        self.blacklisted_ips = []
         self.time_since_last_check = 0
         self.time_since_last_alert = 0
 
@@ -35,7 +37,7 @@ class PortscanHandler(AttackHandler):
         if isinstance(better_packet, TCPPacket):
             if time.time() - self.time_since_last_check > TIME_TO_CHECK:
                 self.time_since_last_check = time.time()
-                self.ports = []
+                self.ip_ports_map = {}
 
             self.handle_tcp_packet(better_packet)
 
@@ -43,18 +45,29 @@ class PortscanHandler(AttackHandler):
         if is_syn_packet(better_packet.packet):
             if better_packet.get_source_ip() == self.user_ip:
                 return
-            if better_packet.get_destination_port() in self.ports:
+            if better_packet.get_destination_port() in self.ip_ports_map:
                 return
-            self.ports.append(better_packet.get_destination_port())
-            counter = len(self.ports)
-            if counter > MAX_SYNS:
+            if better_packet.get_source_ip() not in self.ip_ports_map:
+                self.ip_ports_map[better_packet.get_source_ip()] = []
+            self.ip_ports_map[better_packet.get_source_ip()].append(better_packet.get_destination_port())
+            counter = len(self.ip_ports_map[better_packet.get_source_ip()])
+            if better_packet.get_source_ip() in self.blacklisted_ips:
+                self.protect_attack(better_packet)
+            elif counter > MAX_SYNS:
+                self.protect_attack(better_packet)
                 if time.time() - self.time_since_last_alert > 60:
                     self.time_since_last_alert = time.time()
                     print("Portscan detected!")
-                    self.save_attack(better_packet, False)
                     print(f"Portscan detected from ip {better_packet.get_source_ip()}!")
                     self.notify(f"ip {better_packet.get_source_ip()} is scanning ports!")
 
+    def protect_attack(self, better_packet):
+        try:
+            if better_packet.get_source_ip() not in self.blacklisted_ips:
+                self.blacklisted_ips.append(better_packet.get_source_ip())
+                print(f"Blacklisted ip {better_packet.get_source_ip()}")
+            better_packet.drop()
+            self.save_attack(better_packet, True)
+        except IndexError:
+            self.save_attack(better_packet, False)
 
-    def protect_attack(self):
-        pass

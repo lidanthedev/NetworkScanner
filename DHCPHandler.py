@@ -37,8 +37,9 @@ class DHCPHandler(AttackHandler):
                 print(f"ADD DHCP: {network_name} {better_packet.get_source_mac()}")
                 self.mac_table[network_name] = better_packet.get_source_mac()
 
-    def protect_attack(self):
-        pass
+    def protect_attack(self, better_packet):
+        better_packet.get_nfq_packet().drop()
+
 
     def is_packet_dhcp_ack(self, better_packet):
         return better_packet.packet[DHCP].options[0][1] == 5

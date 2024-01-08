@@ -40,7 +40,7 @@ class ARPHandler(AttackHandler):
                     f"IP {ip} has multiple MAC addresses: {self.arp_table[ip]} and {arp_packet.get_response_mac()}"
                 )
 
-    def protect_attack(self):
+    def protect_attack(self, better_packet):
         print("PROTECT ARP!!!!")
 
     def find_devices_on_network(self):

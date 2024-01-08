@@ -1,9 +1,11 @@
-from scapy.layers.dns import DNS
-from scapy.layers.l2 import Ether, ARP
-from scapy.layers.inet import IP, TCP
-from scapy.packet import Packet
-from scapy.layers.dhcp import DHCP
 import dataclasses
+
+import netfilterqueue
+from scapy.layers.dhcp import DHCP
+from scapy.layers.dns import DNS
+from scapy.layers.inet import IP, TCP
+from scapy.layers.l2 import Ether, ARP
+from scapy.packet import Packet
 
 ARP_REPLY_CODE = 2
 
@@ -13,23 +15,40 @@ ARP_REQUEST_CODE = 1
 @dataclasses.dataclass
 class MACPacket:
     packet: Packet
+    nfq_packet: netfilterqueue.Packet
+    dropped: bool
 
-    def __init__(self, packet: Packet):
-        self.packet = packet
+    def __init__(self, scapy_packet: Packet, nfq_packet: netfilterqueue.Packet):
+        self.packet = scapy_packet
+        self.nfq_packet = nfq_packet
+        self.dropped = False
 
     def __str__(self):
         return f"MAC:" \
                f"  Source MAC: {self.get_source_mac()}" \
                f"  Destination MAC: {self.get_destination_mac()}\n"
 
-    def get_packet(self) -> Packet:
+    def get_scapy_packet(self) -> Packet:
         return self.packet
 
+    def get_nfq_packet(self) -> netfilterqueue.Packet:
+        return self.nfq_packet
+
     def get_source_mac(self) -> str:
-        return self.packet[Ether].src
+        try:
+            return self.packet[Ether].src
+        except IndexError:
+            return "UNKNOWN"
 
     def get_destination_mac(self) -> str:
-        return self.packet[Ether].dst
+        try:
+            return self.packet[Ether].dst
+        except IndexError:
+            return "UNKNOWN"
+
+    def drop(self):
+        self.dropped = True
+        self.nfq_packet.drop()
 
 
 class IPPacket(MACPacket):
@@ -136,22 +155,22 @@ class DNSPacket(MACPacket):
         return ""
 
 
-def to_better_packet(packet):
-    if packet.haslayer(DHCP) and packet.haslayer(Ether) and packet.haslayer(IP):
-        return DHCPPacket(packet)
-    if packet.haslayer(TCP) and packet.haslayer(IP) and packet.haslayer(Ether):
-        return TCPPacket(packet)
-    elif packet.haslayer(DNS) and packet.haslayer(Ether):
-        return DNSPacket(packet)
-    elif packet.haslayer(IP) and packet.haslayer(Ether):
-        return IPPacket(packet)
-    elif packet.haslayer(ARP) and packet.haslayer(Ether):
-        if packet[ARP].op == ARP_REQUEST_CODE:
-            return ARPPacket(packet)
-        elif packet[ARP].op == ARP_REPLY_CODE:
-            return ARPReplyPacket(packet)
-    elif packet.haslayer(Ether):
-        return MACPacket(packet)
+def to_better_packet(scapy_packet, nfq_packet):
+    if scapy_packet.haslayer(DHCP) and scapy_packet.haslayer(IP):
+        return DHCPPacket(scapy_packet, nfq_packet)
+    if scapy_packet.haslayer(TCP) and scapy_packet.haslayer(IP):
+        return TCPPacket(scapy_packet, nfq_packet)
+    elif scapy_packet.haslayer(IP):
+        return IPPacket(scapy_packet, nfq_packet)
+    elif scapy_packet.haslayer(DNS) and scapy_packet.haslayer(Ether):
+        return DNSPacket(scapy_packet, nfq_packet)
+    elif scapy_packet.haslayer(ARP) and scapy_packet.haslayer(Ether):
+        if scapy_packet[ARP].op == ARP_REQUEST_CODE:
+            return ARPPacket(scapy_packet, nfq_packet)
+        elif scapy_packet[ARP].op == ARP_REPLY_CODE:
+            return ARPReplyPacket(scapy_packet, nfq_packet)
+    elif scapy_packet.haslayer(Ether):
+        return MACPacket(scapy_packet, nfq_packet)
     else:
         return None
     return None

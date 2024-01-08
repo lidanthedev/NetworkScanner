@@ -1,13 +1,15 @@
+import atexit
 import json
 
 from flask import Flask
 from flask import request
 from flask_cors import CORS
 
+import iptablesUtils
 from Scanner import Scanner
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, supports_credentials=True)
 
 scanner = Scanner()
 scanner.start()
@@ -53,6 +55,10 @@ def get_notifications():
     return scanner.get_notifications()
 
 
+def exit_handler():
+    scanner.stop()
+
+    
 @app.route("/getAttacks")
 def get_attacks():
     try:
@@ -63,4 +69,5 @@ def get_attacks():
 
 
 if __name__ == "__main__":
+    atexit.register(exit_handler)
     app.run()
