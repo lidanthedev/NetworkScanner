@@ -48,6 +48,7 @@ class PortscanHandler(AttackHandler):
             self.ports.append(better_packet.get_destination_port())
             counter = len(self.ports)
             if counter > MAX_SYNS:
+                self.protect_attack(better_packet)
                 if time.time() - self.time_since_last_alert > 60:
                     self.time_since_last_alert = time.time()
                     print("Portscan detected!")
@@ -56,4 +57,4 @@ class PortscanHandler(AttackHandler):
                     self.notify(f"ip {better_packet.get_source_ip()} is scanning ports!")
 
     def protect_attack(self, better_packet):
-        pass
+        better_packet.drop()
