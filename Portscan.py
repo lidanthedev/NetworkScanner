@@ -23,7 +23,7 @@ class PortscanHandler(AttackHandler):
     user_ip: str
 
     def __init__(self):
-        super().__init__(AttackHandler.PORT_HANDLER_ID)
+        super().__init__(AttackHandler.PORT_HANDLER_ID, AttackHandler.NFQUEUE_HANDLER_TYPE)
         self.ports = []
         self.time_since_last_check = 0
         self.time_since_last_alert = 0

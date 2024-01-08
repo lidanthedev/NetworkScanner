@@ -1,31 +1,25 @@
-import multiprocessing
 import threading
-
-import netfilterqueue
-import scapy.layers.http
-
-from scapy.layers.dns import DNS
-from scapy.layers.inet import IP, TCP, Ether
-from scapy.layers.http import HTTP
 from typing import List
 
+import netfilterqueue
+from netfilterqueue import NetfilterQueue
+from scapy.layers.inet import IP
+from scapy.sendrecv import AsyncSniffer
+
 import PacketWrapper
+import iptablesUtils
+from ARPHandler import ARPHandler
 from AttackHandler import AttackHandler
 from DHCPHandler import DHCPHandler
 from DNSHandler import DNSHandler
 from EvilTwinHandler import EvilTwinHandler
-from scapy.sendrecv import sniff
-from scapy.sendrecv import AsyncSniffer
-
-from ARPHandler import ARPHandler
 from Portscan import PortscanHandler
-from netfilterqueue import NetfilterQueue
-import iptablesUtils
 
 
 class Scanner:
     handlers: List[AttackHandler]
     queue: NetfilterQueue
+    sniffer: AsyncSniffer
     state: bool
 
     QUEUE_NUM = 0
@@ -33,22 +27,27 @@ class Scanner:
     def __init__(self):
         self.handlers = [ARPHandler(), DHCPHandler(), EvilTwinHandler(), DNSHandler(), PortscanHandler()]
         self.queue = NetfilterQueue()
-        self.queue_proc = None
+        self.sniffer = AsyncSniffer(prn=self.handle_packet_sniff)
+        self.queue_thread = None
         self.state = False
 
     def handle_packet(self, nfq_packet: netfilterqueue.Packet):
         scapy_packet = IP(nfq_packet.get_payload())
 
-        # print(scapy_packet.summary())
         better_packet = PacketWrapper.to_better_packet(scapy_packet, nfq_packet)
-        # print(better_packet)
         if better_packet is not None:
             for handler in self.handlers:
-                if handler.enabled:
+                if handler.handler_type == AttackHandler.NFQUEUE_HANDLER_TYPE and handler.enabled:
                     handler.handle_packet(better_packet)
+        if not better_packet.dropped:
+            nfq_packet.accept()
 
-        # print(scapy_packet.summary())
-        nfq_packet.accept()
+    def handle_packet_sniff(self, scapy_packet):
+        better_packet = PacketWrapper.to_better_packet(scapy_packet, None)
+        if better_packet is not None:
+            for handler in self.handlers:
+                if handler.handler_type == AttackHandler.SCAPY_HANDLER_TYPE and handler.enabled:
+                    handler.handle_packet(better_packet)
 
     def set_attack_state(self, id_attack, state):
         for handler in self.handlers:
@@ -61,8 +60,9 @@ class Scanner:
         self.state = True
         iptablesUtils.add_ip_table(self.QUEUE_NUM)
         self.queue.bind(self.QUEUE_NUM, self.handle_packet)
-        self.queue_proc = threading.Thread(target=self.queue.run, daemon=True)
-        self.queue_proc.start()
+        self.queue_thread = threading.Thread(target=self.queue.run, daemon=True)
+        self.queue_thread.start()
+        self.sniffer.start()
 
     def stop(self):
         print("Scanner Stopped")

@@ -1,4 +1,3 @@
-import subprocess
 import iptc
 
 
@@ -40,3 +39,5 @@ def remove_ip_table(id_table):
 
     # Delete the rule from the chain
     chain.delete_rule(rule)
+
+# manual disable: sudo iptables -D INPUT -j NFQUEUE --queue-num 0

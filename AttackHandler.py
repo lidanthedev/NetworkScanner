@@ -1,10 +1,10 @@
-import random
 import time
 import uuid
 from abc import ABC, abstractmethod
+
 import JsonUtils
 import WifiUtils
-import time
+
 
 class AttackHandler(ABC):
     DHCP_HANDLER_ID = "DHCP SPOOFING"
@@ -13,12 +13,18 @@ class AttackHandler(ABC):
     DNS_HANDLER_ID = "DNS Poisoning"
     PORT_HANDLER_ID = "Port Scan"
 
-    notifications: list[dict]
+    SCAPY_HANDLER_TYPE = "scapy"
+    NFQUEUE_HANDLER_TYPE = "nfqueue"
 
-    def __init__(self, handler_id):
+    notifications: list[dict]
+    handler_id: str
+    handler_type: str
+
+    def __init__(self, handler_id, handler_type=SCAPY_HANDLER_TYPE):
         self.notifications = []
         self.handler_id = handler_id
         self.enabled = True
+        self.handler_type = handler_type
 
     @abstractmethod
     def handle_packet(self, better_packet):
