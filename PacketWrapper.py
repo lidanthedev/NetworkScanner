@@ -134,8 +134,8 @@ class DNSPacket(MACPacket):
             if self.packet[DNS].qd is not None:
                 return self.packet[DNS].qd.qname.decode("utf-8")
             elif self.packet[DNS].an is not None:
-                return self.packet[DNS].an.rdata
-        finally:
+                return self.packet[DNS].an.rdata[0].decode("utf-8")
+        except:
             return ""
 
     def get_type(self) -> str:

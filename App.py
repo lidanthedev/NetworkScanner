@@ -1,4 +1,5 @@
 import atexit
+import json
 
 from flask import Flask
 from flask import request
@@ -40,22 +41,31 @@ def toggle():
 
 
 @app.route("/getState")
-def getState():
+def get_state():
     return {"state": scanner.state}
 
 
 @app.route("/getAttacksState")
-def getAttacksState():
+def get_attacks_state():
     return [{"id": handler.handler_id, "state": handler.enabled} for handler in scanner.handlers]
 
 
 @app.route("/getNotifications")
-def getNotifications():
+def get_notifications():
     return scanner.get_notifications()
 
 
 def exit_handler():
     scanner.stop()
+
+    
+@app.route("/getAttacks")
+def get_attacks():
+    try:
+        with open("attacks.json", "r") as f:
+            return json.loads(f.read())
+    except FileNotFoundError:
+        return []
 
 
 if __name__ == "__main__":
