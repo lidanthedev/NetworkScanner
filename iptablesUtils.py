@@ -2,23 +2,29 @@ import iptc
 
 
 def add_ip_table(id_table):
-    # Create a new rule
-    rule = iptc.Rule()
+    for port in ["5173", "5000"]:
+        # Create a new rule
+        rule = iptc.Rule()
 
-    # Create a target for the rule
-    target = iptc.Target(rule, "NFQUEUE")
+        # Create a match for the rule
+        match = iptc.Match(rule, "tcp")
+        match.dport = port
+        rule.add_match(match)
 
-    # Set the queue number to the target
-    target.set_parameter("queue-num", str(id_table))
+        # Create a target for the rule
+        target = iptc.Target(rule, "NFQUEUE")
 
-    # Set the rule's target
-    rule.target = target
+        # Set the queue number to the target
+        target.set_parameter("queue-num", str(id_table))
 
-    # Get the "INPUT" chain
-    chain = iptc.Chain(iptc.Table(iptc.Table.FILTER), "INPUT")
+        # Set the rule's target
+        rule.target = target
 
-    # Insert the rule into the chain
-    chain.insert_rule(rule)
+        # Get the "INPUT" chain
+        chain = iptc.Chain(iptc.Table(iptc.Table.FILTER), "INPUT")
+
+        # Insert the rule into the chain
+        chain.insert_rule(rule)
 
 
 def remove_ip_table(id_table):
