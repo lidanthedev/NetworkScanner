@@ -47,7 +47,6 @@ class Scanner:
         :return: None
         """
         scapy_packet = IP(nfq_packet.get_payload())
-
         better_packet = PacketWrapper.to_better_packet(scapy_packet, nfq_packet)
         if better_packet is not None:
             for handler in self.handlers:
@@ -94,6 +93,7 @@ class Scanner:
         print("Scanner Started")
         self.state = True
         iptablesUtils.add_ip_table(self.QUEUE_NUM)
+        self.queue = NetfilterQueue()
         self.queue.bind(self.QUEUE_NUM, self.handle_packet)
         self.queue_thread = threading.Thread(target=self.queue.run, daemon=True)
         self.queue_thread.start()
