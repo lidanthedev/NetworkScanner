@@ -11,6 +11,11 @@ TIME_TO_CHECK = 1
 
 
 def is_syn_packet(packet):
+    """
+    Check if the packet is a syn packet
+    :param packet: the packet to check
+    :return: true if the packet is a syn packet, false otherwise
+    """
     if packet.haslayer(TCP):
         return packet[TCP].flags == 'S'
     return False
@@ -25,6 +30,9 @@ class PortscanHandler(AttackHandler):
     user_ip: str
 
     def __init__(self):
+        """
+        Initialize the portscan handler
+        """
         super().__init__(AttackHandler.PORT_HANDLER_ID, AttackHandler.NFQUEUE_HANDLER_TYPE)
         self.ip_ports_map = {}
         self.blacklisted_ips = []
@@ -36,6 +44,11 @@ class PortscanHandler(AttackHandler):
         self.user_ip = my_ip_packet.src
 
     def handle_packet(self, better_packet):
+        """
+        Handle a packet
+        :param better_packet: the packet to handle
+        :return: None
+        """
         if isinstance(better_packet, TCPPacket):
             if time.time() - self.time_since_last_check > TIME_TO_CHECK:
                 self.time_since_last_check = time.time()
@@ -44,6 +57,11 @@ class PortscanHandler(AttackHandler):
             self.handle_tcp_packet(better_packet)
 
     def handle_tcp_packet(self, better_packet):
+        """
+        Handle a tcp packet
+        :param better_packet: the packet to handle
+        :return: None
+        """
         if is_syn_packet(better_packet.packet):
             if better_packet.get_source_ip() == self.user_ip:
                 return
@@ -64,6 +82,11 @@ class PortscanHandler(AttackHandler):
                     self.notify(f"ip {better_packet.get_source_ip()} is scanning ports!")
 
     def protect_attack(self, better_packet):
+        """
+        Protect from an attack
+        :param better_packet: the packet to protect from
+        :return: None
+        """
         try:
             if better_packet.get_source_ip() not in self.blacklisted_ips:
                 self.blacklisted_ips.append(better_packet.get_source_ip())
