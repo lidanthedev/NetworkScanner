@@ -1,53 +1,40 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import './App.css';
+import CheckedAttacks from "./CheckedAttacks.tsx";
+import NotificationsSender from "./NotificationsSender.tsx";
+import {createTheme, CssBaseline, ThemeProvider} from "@mui/material";
+import Scanner from "./Scanner.tsx";
+import AttacksAccordions from "./AttacksAccordions.tsx";
+import AttackAccordion from "./AttackAccordion.tsx";
 
 function App() {
-  const [scannerState, setScannerState] = useState(false);
-  const stateBtnRef = useRef<HTMLButtonElement>(null);
+  const [darkMode, setDarkMode] = useState('dark')
 
-  useEffect(() => {
-    const fetchScannerState = async () => {
-      const state = await getScannerState();
-      setScannerState(state);
-    };
+  const darkTheme = createTheme({
+    palette: {
+      mode: darkMode ? 'dark' : 'light',
+    },
+  });
 
-    fetchScannerState();
-  }, []);
+  const dummyAttackData = {
+    "Attack_name": "DHCP SPOOFING",
+    "Date": "04/01/2024",
+    "IP": "10.0.0.16",
+    "Is_Defended": false,
+    "MAC": "58:6c:25:9e:cc:b2",
+    "Time": "20:50:32",
+    "WIFI": "Simion-Gaming"
+  }
 
   return (
-    <>
-      <h1>Toggle Scanner</h1>
-      <button ref={stateBtnRef} onClick={async () => {
-        if (stateBtnRef.current == null) {
-          return;
-        }
-        stateBtnRef.current.disabled = true;
-        const state = await setScanner(!scannerState);
-        setScannerState(state);
-        stateBtnRef.current.disabled = false;
-      }}>
-      Scanner is now {scannerState ? "On" : "Off"}
-    </button>
-  </>
+    <ThemeProvider theme={darkTheme}>
+      <CssBaseline/>
+      <Scanner/>
+      <AttacksAccordions/>
+    </ThemeProvider>
   )
 }
 
-async function setScanner(mode: boolean): Promise<boolean> {
-  const response = await fetch('http://localhost:5000/setState', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ state: mode })
-  });
-  const data = await response.json();
-  return data["state"];
-}
 
-async function getScannerState(): Promise<boolean> {
-  const response = await fetch('http://localhost:5000/getState');
-  const data = await response.json();
-  return data["state"];
-}
 
 export default App;
