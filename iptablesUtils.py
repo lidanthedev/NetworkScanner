@@ -2,6 +2,11 @@ import iptc
 
 
 def add_ip_table(id_table):
+    """
+    Add a new IP table to the INPUT chain.
+    :param id_table: The ID of the table.
+    :return None
+    """
     # Create a new rule
     rule = iptc.Rule()
 
@@ -22,6 +27,11 @@ def add_ip_table(id_table):
 
 
 def remove_ip_table(id_table):
+    """
+    Remove an IP table from the INPUT chain.
+    :param id_table: The ID of the table.
+    :return: None
+    """
     # Create a new rule
     rule = iptc.Rule()
 

@@ -12,6 +12,9 @@ class ARPHandler(AttackHandler):
     arp_table: dict[str, str]
 
     def __init__(self):
+        """
+        Initialize the ARP handler.
+        """
         super().__init__(AttackHandler.ARP_HANDLER_ID)
         self.arp_table = {}
 
@@ -21,10 +24,22 @@ class ARPHandler(AttackHandler):
         scanner_thread.start()
 
     def handle_packet(self, better_packet: MACPacket):
+        """
+        Handle a network packet.
+
+        :param better_packet: The network packet to handle.
+        :type better_packet: MACPacket
+        """
         if isinstance(better_packet, ARPPacket):
             self.handle_arp(better_packet)
 
     def handle_arp(self, arp_packet):
+        """
+        Handle ARP packets.
+
+        :param arp_packet: The ARP packet to handle.
+        :type arp_packet: ARPPacket
+        """
         if isinstance(arp_packet, ARPReplyPacket):
             ip = arp_packet.get_source_ip()
             if ip not in self.arp_table:
@@ -41,9 +56,19 @@ class ARPHandler(AttackHandler):
                 )
 
     def protect_attack(self, better_packet):
+        """
+        Protects against ARP attacks by handling the given packet.
+
+        :param better_packet: The packet to be handled.
+        :type better_packet: Packet
+        """
         print("PROTECT ARP!!!!")
 
     def find_devices_on_network(self):
+        """
+        Scan devices on the network using ARP
+        Uses a weird feature in scapy that allows you to send an ARP request to a broadcast MAC address to find all devices on the network
+        """
         scapy_logger = logging.getLogger("scapy.runtime")
         old_level = scapy_logger.level
         scapy_logger.setLevel(logging.ERROR)

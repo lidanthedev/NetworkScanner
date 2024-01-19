@@ -25,7 +25,13 @@ class Scanner:
     QUEUE_NUM = 0
 
     def __init__(self):
-        self.handlers = [ARPHandler(), DHCPHandler(), EvilTwinHandler(), DNSHandler(), PortscanHandler()]
+        self.handlers = [
+            ARPHandler(),
+            DHCPHandler(),
+            EvilTwinHandler(),
+            DNSHandler(),
+            PortscanHandler(),
+        ]
         self.queue = NetfilterQueue()
         self.sniffer = AsyncSniffer(prn=self.handle_packet_sniff)
         self.queue_thread = None
@@ -37,7 +43,10 @@ class Scanner:
         better_packet = PacketWrapper.to_better_packet(scapy_packet, nfq_packet)
         if better_packet is not None:
             for handler in self.handlers:
-                if handler.handler_type == AttackHandler.NFQUEUE_HANDLER_TYPE and handler.enabled:
+                if (
+                    handler.handler_type == AttackHandler.NFQUEUE_HANDLER_TYPE
+                    and handler.enabled
+                ):
                     handler.handle_packet(better_packet)
         if not better_packet.dropped:
             nfq_packet.accept()
@@ -46,7 +55,10 @@ class Scanner:
         better_packet = PacketWrapper.to_better_packet(scapy_packet, None)
         if better_packet is not None:
             for handler in self.handlers:
-                if handler.handler_type == AttackHandler.SCAPY_HANDLER_TYPE and handler.enabled:
+                if (
+                    handler.handler_type == AttackHandler.SCAPY_HANDLER_TYPE
+                    and handler.enabled
+                ):
                     handler.handle_packet(better_packet)
 
     def set_attack_state(self, id_attack, state):
