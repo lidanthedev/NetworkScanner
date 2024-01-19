@@ -5,6 +5,11 @@ FILE_NAME = "attacks"
 
 
 def save_attack_data(data: dict[str, str]):
+    """
+    Save an attack to the database
+    :param data: the data to save
+    :return: None
+    """
     if not os.path.exists(f"./{FILE_NAME}.json"):
         with open(f"./{FILE_NAME}.json", "w") as f:
             json.dump([], f, indent=4)
