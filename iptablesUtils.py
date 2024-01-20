@@ -1,4 +1,5 @@
 import iptc
+import subprocess
 
 
 def add_ip_table(id_table):
@@ -30,7 +31,7 @@ def remove_ip_table(id_table):
 
     # Delete the rule from the chain
     chain.delete_rule(rule)
-
+# manual disable: sudo iptables -D INPUT -j NFQUEUE --queue-num 0
 
 def make_rule(id_table):
     """
@@ -50,3 +51,31 @@ def make_rule(id_table):
 
 # manual disable: sudo iptables -L INPUT --line-numbers
 # sudo iptables -D INPUT [NUM]
+
+
+def block_mac_address(mac_to_block: str):
+    try
+        command = f"iptables -A INPUT -m mac --mac-source {mac_to_block} -j DROP"
+        subprocess.run(command, shell=True)
+    except subprocess.CalledProcessError as e:
+        print(f"Something went wrong while blocking a mac address, error is: {e}")
+
+def unblock_mac_address(mac_to_block: str):
+
+    try:
+        mac_to_block = mac_to_block.upper()
+        # Get the line number of the rule to be removed
+        command = f"iptables -L INPUT -n -v --line-numbers | grep ד{mac_to_block}"
+        result = subprocess.check_output(command, shell=True)
+        lines = result.decode().split('\n')
+        for line in lines:
+            if mac_to_block in line:
+                # Extract the line number
+                line_num = line.split(' ')[0]
+                # Remove the rule
+                command = f"iptables -D INPUT {line_num}"
+
+                subprocess.run(command, shell=True)
+    except subprocess.CalledProcessError as e:
+        print(f"Something went wrong while unblocking a mac address, error is: {e}")
+
