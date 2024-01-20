@@ -54,22 +54,32 @@ def make_rule(id_table):
 
 
 def block_mac_address(mac_to_block: str):
-    try
+    """
+    Will block all packets from given mac address
+    :param mac_to_block: The mac to block
+    :return: None
+    """
+    try:
         command = f"iptables -A INPUT -m mac --mac-source {mac_to_block} -j DROP"
         subprocess.run(command, shell=True)
     except subprocess.CalledProcessError as e:
         print(f"Something went wrong while blocking a mac address, error is: {e}")
 
-def unblock_mac_address(mac_to_block: str):
 
+def unblock_mac_address(mac_to_unblock: str):
+    """
+    Will unblock all the given mac adress
+    :param mac_to_unblock: the mac to unblock
+    :return: None
+    """
     try:
-        mac_to_block = mac_to_block.upper()
+        mac_to_unblock = mac_to_unblock.upper()
         # Get the line number of the rule to be removed
-        command = f"iptables -L INPUT -n -v --line-numbers | grep ד{mac_to_block}"
+        command = f"iptables -L INPUT -n -v --line-numbers | grep ד{mac_to_unblock}"
         result = subprocess.check_output(command, shell=True)
         lines = result.decode().split('\n')
         for line in lines:
-            if mac_to_block in line:
+            if mac_to_unblock in line:
                 # Extract the line number
                 line_num = line.split(' ')[0]
                 # Remove the rule
