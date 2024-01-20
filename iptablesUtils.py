@@ -54,7 +54,7 @@ def make_rule(id_table):
 
 
 def block_mac_address(mac_to_block: str):
-    try
+    try:
         command = f"iptables -A INPUT -m mac --mac-source {mac_to_block} -j DROP"
         subprocess.run(command, shell=True)
     except subprocess.CalledProcessError as e:
