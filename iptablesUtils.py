@@ -1,4 +1,5 @@
 import iptc
+import subprocess
 
 
 def add_ip_table(id_table):
@@ -53,49 +54,28 @@ def remove_ip_table(id_table):
 # manual disable: sudo iptables -D INPUT -j NFQUEUE --queue-num 0
 
 
-def add_mac_block_ip_table(mac_address: str):
-    # Create an IPTables object
-    iptables = iptc.IPTables()
+def block_mac_address(mac_to_block: str):
+    try
+        command = f"iptables -A INPUT -m mac --mac-source {mac_to_block} -j DROP"
+        subprocess.run(command, shell=True)
+    except subprocess.CalledProcessError as e:
+        print(f"Something went wrong while blocking a mac address, error is: {e}")
 
-    # Create a rule to block traffic from the specified MAC address
-    rule = iptc.Rule()
-    rule.add_match(iptc.Match('mac', '--mac-source', mac_address))
-    rule.target = iptc.Target('DROP')
+def unblock_mac_address(mac_to_block: str):
 
-    # Apply the rule to the INPUT chain on all interfaces
-    iptables.table['filter'].chain['INPUT'].append_rule(rule, interface=None)
+    try:
+        mac_to_block = mac_to_block.upper()
+        # Get the line number of the rule to be removed
+        command = f"iptables -L INPUT -n -v --line-numbers | grep ד{mac_to_block}"
+        result = subprocess.check_output(command, shell=True)
+        lines = result.decode().split('\n')
+        for line in lines:
+            if mac_to_block in line:
+                # Extract the line number
+                line_num = line.split(' ')[0]
+                # Remove the rule
+                command = f"iptables -D INPUT {line_num}"
 
-    # Save the rules
-    iptables.save()
-
-    print(f"Successfully added an ip-table to block {mac_address} and traffic from it")
-
-
-def remove_mac_block_ip_table(mac_address: str):
-    # Create an IPTables object
-    iptables = iptc.IPTables()
-
-    # Find the rule that blocks traffic from the specified MAC address
-    existing_rules = iptables.table['filter'].chain['INPUT'].rules
-    rule_to_remove = None
-
-    for rule in existing_rules:
-        if (
-                rule.matches
-                and rule.matches[0].name == 'mac'
-                and rule.matches[0].args[0] == '--mac-source'
-                and rule.matches[0].args[1] == mac_address
-        ):
-            rule_to_remove = rule
-            break
-
-    # Remove the rule from the INPUT chain
-    if rule_to_remove:
-        iptables.table['filter'].chain['INPUT'].remove_rule(rule_to_remove)
-
-        # Save the updated rules
-        iptables.save()
-
-        print(f"Removed block for traffic from MAC address {mac_address}")
-    else:
-        print(f"No existing rule found for MAC address {mac_address}")
+                subprocess.run(command, shell=True)
+    except subprocess.CalledProcessError as e:
+        print(f"Something went wrong while unblocking a mac address, error is: {e}")
