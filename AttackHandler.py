@@ -6,7 +6,6 @@ import JsonUtils
 import WifiUtils
 
 
-
 class AttackHandler(ABC):
     DHCP_HANDLER_ID = "DHCP SPOOFING"
     EVIL_TWIN_HANDLER_ID = "Evil Twin"
@@ -85,3 +84,10 @@ class AttackHandler(ABC):
                         "time": int(time.time() * 1000)}
         self.notifications.append(notification)
         return notification
+
+    def cleanup(self):
+        """
+        Clean up the attack handler
+        :return: None
+        """
+        pass

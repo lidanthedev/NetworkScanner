@@ -1,15 +1,32 @@
-import threading
 import logging
+import threading
 
-from scapy.sendrecv import srp, sr1, sr
+from scapy.layers.l2 import ARP, Ether
+from scapy.sendrecv import sr
 
+import ArpUtils
 from AttackHandler import AttackHandler
 from PacketWrapper import ARPPacket, ARPReplyPacket, MACPacket
-from scapy.layers.l2 import ARP, Ether
+
+
+def find_devices_on_network():
+    """
+    Scan devices on the network using ARP
+    Uses a weird feature in scapy that allows you to send an ARP request to a broadcast MAC address to find all devices on the network
+    """
+    scapy_logger = logging.getLogger("scapy.runtime")
+    old_level = scapy_logger.level
+    scapy_logger.setLevel(logging.ERROR)
+    arp_request = ARP() / Ether(dst="ff:ff:ff:ff:ff:ff")
+    arp_request.pdst = arp_request.psrc + "/24"
+    sr(arp_request, timeout=1, verbose=False)
+    scapy_logger.setLevel(old_level)
+    print("ARP SCAN COMPLETE")
 
 
 class ARPHandler(AttackHandler):
     arp_table: dict[str, str]
+    static_arp_table: dict[str, str]
 
     def __init__(self):
         """
@@ -17,10 +34,11 @@ class ARPHandler(AttackHandler):
         """
         super().__init__(AttackHandler.ARP_HANDLER_ID)
         self.arp_table = {}
+        self.static_arp_table = {}
 
         # run find_device_on_network in a thread
 
-        scanner_thread = threading.Thread(target=self.find_devices_on_network, daemon=True)
+        scanner_thread = threading.Thread(target=find_devices_on_network, daemon=True)
         scanner_thread.start()
 
     def handle_packet(self, better_packet: MACPacket):
@@ -49,31 +67,34 @@ class ARPHandler(AttackHandler):
                 print(
                     f"DETECTED ARP POISONING: IP {ip} has multiple MAC addresses: {self.arp_table[ip]} and {arp_packet.get_response_mac()}"
                 )
-                self.save_attack(arp_packet, False)
 
                 self.notify(
                     f"IP {ip} has multiple MAC addresses: {self.arp_table[ip]} and {arp_packet.get_response_mac()}"
                 )
+                self.protect_attack(arp_packet)
 
-    def protect_attack(self, better_packet):
+    def protect_attack(self, arp_packet):
         """
         Protects against ARP attacks by handling the given packet.
 
-        :param better_packet: The packet to be handled.
-        :type better_packet: Packet
+        :param arp_packet: The packet to be handled.
+        :type arp_packet: ARPPacket
         """
-        print("PROTECT ARP!!!!")
+        try:
+            ip = arp_packet.get_source_ip()
+            if ip not in self.static_arp_table:
+                ArpUtils.set_static_arp(ip, self.arp_table[ip])
+                self.static_arp_table[ip] = self.arp_table[ip]
+            self.save_attack(arp_packet, True)
+            print("ARP PROTECTION SUCCESSFUL")
+        except Exception as e:
+            print(f"ARP PROTECTION FAILED {e}")
+            self.save_attack(arp_packet, False)
 
-    def find_devices_on_network(self):
+    def cleanup(self):
         """
-        Scan devices on the network using ARP
-        Uses a weird feature in scapy that allows you to send an ARP request to a broadcast MAC address to find all devices on the network
+        Cleans up the ARP handler.
         """
-        scapy_logger = logging.getLogger("scapy.runtime")
-        old_level = scapy_logger.level
-        scapy_logger.setLevel(logging.ERROR)
-        arp_request = ARP() / Ether(dst="ff:ff:ff:ff:ff:ff")
-        arp_request.pdst = arp_request.psrc + "/24"
-        sr(arp_request, timeout=1, verbose=False)
-        scapy_logger.setLevel(old_level)
-        print("ARP SCAN COMPLETE")
+        for ip in self.static_arp_table:
+            ArpUtils.remove_static_arp(ip)
+        print("ARP CLEANUP SUCCESSFUL")

@@ -108,6 +108,8 @@ class Scanner:
         self.state = False
         self.queue.unbind()
         iptablesUtils.remove_ip_table(self.QUEUE_NUM)
+        for handler in self.handlers:
+            handler.cleanup()
 
     def get_notifications(self):
         """

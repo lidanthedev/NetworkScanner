@@ -5,13 +5,13 @@ from flask import Flask
 from flask import request
 from flask_cors import CORS
 
-import iptablesUtils
 from Scanner import Scanner
 
 app = Flask(__name__)
 CORS(app, supports_credentials=True)
 
 scanner = Scanner()
+scanner.start()
 
 
 @app.route("/setAttackState", methods=["POST"])
