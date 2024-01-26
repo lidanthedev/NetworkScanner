@@ -83,12 +83,17 @@ class ARPHandler(AttackHandler):
         try:
             ip = arp_packet.get_source_ip()
             if ip not in self.static_arp_table:
-                ArpUtils.set_static_arp(ip, self.arp_table[ip])
-                self.static_arp_table[ip] = self.arp_table[ip]
-            self.save_attack(arp_packet, True)
-            print("ARP PROTECTION SUCCESSFUL")
+                if ArpUtils.set_static_arp(ip, self.arp_table[ip]):
+                    self.static_arp_table[ip] = self.arp_table[ip]
+                    self.save_attack(arp_packet, True)
+                    print("ARP PROTECTION SUCCESSFUL")
+                    return
+                else:
+                    print("ARP PROTECTION FAILED (are you root?)")
+                    self.save_attack(arp_packet, False)
+                    return
         except Exception as e:
-            print(f"ARP PROTECTION FAILED {e}")
+            print(f"ARP PROTECTION ERROR {e}")
             self.save_attack(arp_packet, False)
 
     def cleanup(self):

@@ -8,7 +8,9 @@ def set_static_arp(ip, mac):
     :param mac: the MAC address
     :return: None
     """
-    subprocess.run(["arp", "-s", ip, mac], capture_output=True, text=True)
+    process = subprocess.run(["arp", "-s", ip, mac], capture_output=True, text=True)
+    return process.returncode == 0
+
 
 
 def remove_static_arp(ip):
@@ -17,4 +19,5 @@ def remove_static_arp(ip):
     :param ip: the IP address
     :return: None
     """
-    subprocess.run(["arp", "-d", ip], capture_output=True, text=True)
+    process = subprocess.run(["arp", "-d", ip], capture_output=True, text=True)
+    return process.returncode == 0
