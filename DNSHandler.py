@@ -14,10 +14,18 @@ class DNSHandler(AttackHandler):
     dns_table: dict[str, list[str]]
 
     def __init__(self):
+        """
+        Initialize the DNS handler
+        """
         super().__init__(AttackHandler.DNS_HANDLER_ID)
         self.dns_table = {}
 
     def handle_packet(self, better_packet: DNSPacket):
+        """
+        Handle a packet
+        :param better_packet: the packet to handle
+        :return: None
+        """
         if isinstance(better_packet, DNSPacket):
             if better_packet.get_type() == DNSPacket.TYPE_QUERY:
                 self.handle_query(better_packet)
@@ -25,14 +33,29 @@ class DNSHandler(AttackHandler):
                 self.handle_response(better_packet)
 
     def protect_attack(self, better_packet):
+        """
+        Protect against an attack
+        :param better_packet: the packet to protect against
+        :return: None
+        """
         pass
 
     def handle_query(self, better_packet: DNSPacket):
+        """
+        Handle a DNS query
+        :param better_packet: the packet to handle
+        :return: None
+        """
         if better_packet.get_domain_name() not in self.dns_table:
             domain = better_packet.get_domain_name()
             self.send_query_to_google(domain)
 
     def send_query_to_google(self, domain):
+        """
+        Send a DNS query to Google's DNS server
+        :param domain: the domain to query
+        :return: None
+        """
         result_ip = ""
         try:
             res = requests.get(GOOGLE_DNS, params={"name": domain, "type": "A"})
@@ -54,6 +77,11 @@ class DNSHandler(AttackHandler):
         return result_ip
 
     def handle_response(self, better_packet):
+        """
+        Handle a DNS response
+        :param better_packet: the packet to handle
+        :return: None
+        """
         domain = better_packet.get_domain_name()
         if domain not in self.dns_table:
             return

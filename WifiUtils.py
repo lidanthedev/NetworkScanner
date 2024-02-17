@@ -2,6 +2,10 @@ import subprocess
 
 
 def get_current_ssid():
+    """
+    Get the current ssid
+    :return:
+    """
     try:
         result = subprocess.check_output(['iwgetid', '--raw'], stderr=subprocess.STDOUT, text=True)
         ssid = result.strip()
@@ -11,6 +15,12 @@ def get_current_ssid():
 
 
 def get_wifi_networks(min_frequency, max_frequency):
+    """
+    Get the Wi-Fi networks
+    :param min_frequency: the minimum frequency
+    :param max_frequency: the maximum frequency
+    :return: the Wi-Fi networks
+    """
     try:
         result = subprocess.run(['iwlist', 'scan'], capture_output=True, text=True)
         # print(result.stdout)

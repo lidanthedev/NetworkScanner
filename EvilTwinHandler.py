@@ -12,11 +12,18 @@ class EvilTwinHandler(AttackHandler):
     MAX_FREQUENCY = 3
 
     def __init__(self):
+        """
+        Initialize the Evil Twin handler
+        """
         super().__init__(AttackHandler.EVIL_TWIN_HANDLER_ID)
         self.time_since_last_check = time.perf_counter()
 
     def handle_packet(self, better_packet):
-
+        """
+        Handle a packet
+        :param better_packet: the packet to handle
+        :return: None
+        """
         # we don't want to check for each packet, that would be a waste
         if time.perf_counter() - self.time_since_last_check > self.TIME_TO_CHECK_EVILTWIN:
             self.time_since_last_check = time.perf_counter()
@@ -29,10 +36,14 @@ class EvilTwinHandler(AttackHandler):
 
             if len(duplicates) > 0:
                 print(f"Evil Twin Detected, networks that appear more than once:")
-                self.save_attack(better_packet, False)
                 for network in duplicates:
                     print(f"\t{network}")
                 self.notify(f"networks that appear more than once: {duplicates}")
 
     def protect_attack(self, better_packet):
+        """
+        Protect against an attack
+        :param better_packet: the packet to protect against
+        :return: None
+        """
         pass
