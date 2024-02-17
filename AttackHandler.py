@@ -16,9 +16,14 @@ class AttackHandler(ABC):
     SCAPY_HANDLER_TYPE = "scapy"
     NFQUEUE_HANDLER_TYPE = "nfqueue"
 
+    MODE_ON = "ON"
+    MODE_OFF = "OFF"
+    MODE_PROTECT = "PROTECT"
+
     notifications: list[dict]
     handler_id: str
     handler_type: str
+    mode: str
 
     def __init__(self, handler_id, handler_type=SCAPY_HANDLER_TYPE):
         """
@@ -29,7 +34,7 @@ class AttackHandler(ABC):
         """
         self.notifications = []
         self.handler_id = handler_id
-        self.enabled = True
+        self.mode = self.MODE_PROTECT
         self.handler_type = handler_type
 
     @abstractmethod
@@ -40,6 +45,17 @@ class AttackHandler(ABC):
         :return: None
         """
         pass
+
+    def try_protect_attack(self, better_packet):
+        """
+        Protect against an attack if the mode is set to protect
+        :param better_packet: the packet to protect against
+        :return: None
+        """
+        if self.mode == self.MODE_PROTECT:
+            self.protect_attack(better_packet)
+        else:
+            self.save_attack(better_packet)
 
     @abstractmethod
     def protect_attack(self, better_packet):
