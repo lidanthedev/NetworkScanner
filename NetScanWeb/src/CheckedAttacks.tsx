@@ -1,4 +1,10 @@
 import {useEffect, useState} from "react";
+import SelectAttack from "./SelectAttack.tsx";
+
+interface AutocompleteOption {
+  label: string;
+}
+const MODES = ["PROTECT", "ON", "OFF"];
 
 export default function CheckedAttacks() {
 
@@ -7,25 +13,7 @@ export default function CheckedAttacks() {
   useEffect(() => {
     fetch('http://localhost:5000/getAttacksState').then(response => response.json()).then(data => {
       const newCheckedAttacks = data.map((attack: any) => (
-        <label style={{display: "flex"}} key={attack["id"]}>
-          <input
-            type="checkbox"
-            defaultChecked={attack["state"]}
-            onChange={async (event) => {
-              event.target.disabled = true;
-              const isChecked = event.target.checked;
-              await fetch('http://localhost:5000/setAttackState', {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({id: attack["id"], state: isChecked})
-              });
-              event.target.disabled = false;
-            }}
-          />
-          {attack["id"]}
-        </label>
+        <SelectAttack attack={attack} key={attack["id"]}/>
       ));
 
       setCheckedAttacks(newCheckedAttacks)

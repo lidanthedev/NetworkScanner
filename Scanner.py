@@ -52,7 +52,7 @@ class Scanner:
             for handler in self.handlers:
                 if (
                     handler.handler_type == AttackHandler.NFQUEUE_HANDLER_TYPE
-                    and (handler.mode == AttackHandler.MODE_PROTECT or handler.mode == AttackHandler.MODE_ON)
+                    and (handler.state == AttackHandler.MODE_PROTECT or handler.state == AttackHandler.MODE_DETECT)
                 ):
                     handler.handle_packet(better_packet)
         if not better_packet.dropped:
@@ -69,7 +69,7 @@ class Scanner:
             for handler in self.handlers:
                 if (
                     handler.handler_type == AttackHandler.SCAPY_HANDLER_TYPE
-                    and (handler.mode == AttackHandler.MODE_PROTECT or handler.mode == AttackHandler.MODE_ON)
+                    and (handler.state == AttackHandler.MODE_PROTECT or handler.state == AttackHandler.MODE_DETECT)
                 ):
                     handler.handle_packet(better_packet)
 
@@ -82,7 +82,7 @@ class Scanner:
         """
         for handler in self.handlers:
             if handler.handler_id == id_attack:
-                handler.enabled = state
+                handler.state = state
                 return
 
     def start(self):
@@ -118,7 +118,7 @@ class Scanner:
         """
         notifications = []
         for handler in self.handlers:
-            if handler.mode == AttackHandler.MODE_PROTECT or handler.mode == AttackHandler.MODE_ON:
+            if handler.state == AttackHandler.MODE_PROTECT or handler.state == AttackHandler.MODE_DETECT:
                 notifications += handler.notifications
                 handler.notifications = []
         return notifications
