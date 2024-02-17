@@ -1,8 +1,8 @@
 from builtins import print
 
-from AttackHandler import AttackHandler
 import requests
 
+from AttackHandler import AttackHandler
 from PacketWrapper import DNSPacket
 
 RESULT_OK = 200
@@ -17,7 +17,7 @@ class DNSHandler(AttackHandler):
         """
         Initialize the DNS handler
         """
-        super().__init__(AttackHandler.DNS_HANDLER_ID)
+        super().__init__(AttackHandler.DNS_HANDLER_ID, AttackHandler.NFQUEUE_HANDLER_TYPE)
         self.dns_table = {}
 
     def handle_packet(self, better_packet: DNSPacket):
@@ -38,7 +38,11 @@ class DNSHandler(AttackHandler):
         :param better_packet: the packet to protect against
         :return: None
         """
-        pass
+        try:
+            better_packet.get_nfq_packet().drop()
+            self.save_attack(better_packet, True)
+        except:
+            self.save_attack(better_packet, False)
 
     def handle_query(self, better_packet: DNSPacket):
         """
@@ -91,6 +95,6 @@ class DNSHandler(AttackHandler):
         if response not in self.dns_table[domain]:
             print(
                 f'DNS SPOOFING DETECTED: {domain} has multiple IP addresses: {response} and {self.dns_table[domain]}')
-            self.save_attack(better_packet, False)
             self.notify(
                 f'{domain} has multiple IP addresses: {response} and {self.dns_table[domain]}')
+            self.protect_attack(better_packet)
