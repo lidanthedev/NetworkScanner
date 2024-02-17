@@ -68,8 +68,8 @@ class AttackHandler(ABC):
                                         "Time": time.strftime("%H:%M:%S"),
                                         "Date": time.strftime("%d/%m/%Y"),
                                         "Is_Defended": is_defended})
-        except:
-            print("Error saving attack data")
+        except Exception as e:
+            print("Error saving attack data ", e)
 
     def notify(self, body, title=None):
         """
