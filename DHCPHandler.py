@@ -1,5 +1,7 @@
 import time
 
+import iptablesUtils
+from AttackHandler import AttackHandler
 from scapy.layers.dhcp import DHCP
 
 import WifiUtils
@@ -51,9 +53,23 @@ class DHCPHandler(AttackHandler):
         :param better_packet: the packet to protect against
         :return: None
         """
+
         try:
-            better_packet.get_nfq_packet().drop()
+            # LEAVE WIFI
+            current_interface = WifiUtils.get_wifi_interface()
+            current_ssid = WifiUtils.get_current_ssid()
+
+            WifiUtils.disconnect_from_current_wifi(current_interface)
+
+            # Block the attacker mac address using the iptables
+            iptablesUtils.block_mac_address(better_packet.get_source_mac())
+
+            # wait a little bit before connecting back
+            time.sleep(3)
+            # RECONNECT WIFI
+            WifiUtils.connect_to_wifi(current_ssid)
             self.save_attack(better_packet, True)
+
         except:
             self.save_attack(better_packet, False)
 

@@ -48,3 +48,46 @@ def get_wifi_networks(min_frequency, max_frequency):
     except Exception as e:
         print(f"An error occurred with EvilTwin: {e} (Are you in Windows?)")
         return None
+
+
+def disconnect_from_current_wifi(wifi_interface):
+    """
+    Will disconnect from the current wifi
+    :param wifi_interface: the wifi interface to disconnect from
+    :return: None
+    """
+    # Run nmcli command to disconnect from the current Wi-Fi network
+    command = ["nmcli", "dev", "disconnect", wifi_interface]
+
+    # Execute the command
+    subprocess.run(command)
+
+
+def connect_to_wifi(ssid):
+    """
+    Will connect to the given SSID
+    :param ssid: the ssid to connect
+    :return: None
+    """
+    # Use nmcli to connect to WiFi
+    cmd = f"nmcli dev wifi connect '{ssid}'"
+
+    try:
+        subprocess.run(cmd, shell=True, check=True)
+        print(f"Successfully connected to {ssid}")
+    except subprocess.CalledProcessError as e:
+        print(f"Failed to connect to {ssid}. Error: {e}")
+
+
+def get_wifi_interface():
+    """
+    Will return the current wifi interface
+    :return: the wifi-interface
+    """
+    try:
+        cmd = "iwconfig 2>&1 | awk '/IEEE/{print $1}'"
+        result = subprocess.check_output(cmd, shell=True, text=True).strip()
+        return result
+    except subprocess.CalledProcessError as e:
+        print(f"Error: {e}")
+        return None
