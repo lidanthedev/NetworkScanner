@@ -1,7 +1,8 @@
 import atexit
 import json
+import Logger
 
-from flask import Flask
+from flask import Flask, send_from_directory
 from flask import request
 from flask_cors import CORS
 
@@ -25,7 +26,7 @@ def set_attack_state():
     state = data["state"]
 
     scanner.set_attack_state(attack_id, state)
-    print(f"Attack {attack_id} state set to {state}")
+    Logger.log(f"Attack {attack_id} state set to {state}")
     return {"id": attack_id, "state": state}
 
 
@@ -93,6 +94,16 @@ def get_attacks():
             return json.loads(f.read())
     except FileNotFoundError:
         return []
+
+
+@app.route("/logs")
+def logs():
+    return Logger.get_all_logs_files()
+
+
+@app.route("/log/<filename>")
+def get_log(filename):
+    return send_from_directory('logs', filename)
 
 
 if __name__ == "__main__":

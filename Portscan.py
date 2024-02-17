@@ -5,6 +5,8 @@ from scapy.layers.inet import TCP, IP
 from AttackHandler import AttackHandler
 from PacketWrapper import TCPPacket
 
+import Logger
+
 MAX_SYNS = 100
 
 TIME_TO_CHECK = 1
@@ -77,8 +79,7 @@ class PortscanHandler(AttackHandler):
                 self.try_protect_attack(better_packet)
                 if time.time() - self.time_since_last_alert > 60:
                     self.time_since_last_alert = time.time()
-                    print("Portscan detected!")
-                    print(f"Portscan detected from ip {better_packet.get_source_ip()}!")
+                    Logger.log(f"Portscan detected from ip {better_packet.get_source_ip()}!")
                     self.notify(f"ip {better_packet.get_source_ip()} is scanning ports!")
 
     def protect_attack(self, better_packet):
@@ -90,7 +91,7 @@ class PortscanHandler(AttackHandler):
         try:
             if better_packet.get_source_ip() not in self.blacklisted_ips:
                 self.blacklisted_ips.append(better_packet.get_source_ip())
-                print(f"Blacklisted ip {better_packet.get_source_ip()}")
+                Logger.log(f"Blacklisted ip {better_packet.get_source_ip()}")
             better_packet.drop()
             if time.time() - self.time_since_last_save > 60:
                 self.time_since_last_save = time.time()

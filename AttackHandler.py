@@ -2,6 +2,7 @@ import time
 import uuid
 from abc import ABC, abstractmethod
 
+import Logger
 import JsonUtils
 import WifiUtils
 
@@ -84,8 +85,8 @@ class AttackHandler(ABC):
                                         "Time": time.strftime("%H:%M:%S"),
                                         "Date": time.strftime("%d/%m/%Y"),
                                         "Is_Defended": is_defended})
-        except Exception as e:
-            print("Error saving attack data ", e)
+        except:
+            Logger.log("Error saving attack data")
 
     def notify(self, body, title=None):
         """

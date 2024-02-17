@@ -1,9 +1,11 @@
+from AttackHandler import AttackHandler
+
+import Logger
 import threading
 from ipaddress import IPv4Interface
 
 import requests
 
-from AttackHandler import AttackHandler
 from PacketWrapper import DNSPacket
 
 RESULT_OK = 200
@@ -75,11 +77,11 @@ class DNSHandler(AttackHandler):
                 if len(addresses) > 0:
                     result_ips = ", ".join(addresses)
                     self.dns_table[domain] = addresses
-                    print("GOOGLE DNS: " + domain + " -> " + result_ips)
+                    Logger.log("GOOGLE DNS: " + domain + " -> " + result_ips)
             else:
-                print("GOOGLE DNS Error: " + str(res.status_code))
+                Logger.log("GOOGLE DNS Error: " + str(res.status_code))
         except Exception as error:
-            print("GOOGLE DNS Error: " + str(error))
+            Logger.log("GOOGLE DNS Error: " + str(error))
         return result_ip
 
     def handle_response(self, better_packet):
@@ -94,8 +96,13 @@ class DNSHandler(AttackHandler):
         response = better_packet.get_response()
         if response == "":
             response = self.dns_table[domain][0]
+<<<<<<< DNSHandler.py
+        if response not in self.dns_table[domain]:
+            Logger.log(
+=======
         if not self.is_in_same_subnet(response, self.dns_table[domain]):
             print(
+>>>>>>> DNSHandler.py
                 f'DNS SPOOFING DETECTED: {domain} has multiple IP addresses: {response} and {self.dns_table[domain]}')
             self.notify(
                 f'{domain} has multiple IP addresses: {response} and {self.dns_table[domain]}')

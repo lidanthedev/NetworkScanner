@@ -1,4 +1,5 @@
 import subprocess
+import Logger
 
 import iptc
 
@@ -67,7 +68,7 @@ def block_mac_address(mac_to_block: str):
         command = f"iptables -A INPUT -m mac --mac-source {mac_to_block} -j DROP"
         subprocess.run(command, shell=True)
     except subprocess.CalledProcessError as e:
-        print(f"Something went wrong while blocking a mac address, error is: {e}")
+        Logger.log(f"Something went wrong while blocking a mac address, error is: {e}")
 
 
 def unblock_mac_address(mac_to_unblock: str):
@@ -91,4 +92,5 @@ def unblock_mac_address(mac_to_unblock: str):
 
                 subprocess.run(command, shell=True)
     except subprocess.CalledProcessError as e:
-        print(f"Something went wrong while unblocking a mac address, error is: {e}")
+        Logger.log(f"Something went wrong while unblocking a mac address, error is: {e}")
+

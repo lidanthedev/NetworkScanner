@@ -5,6 +5,7 @@ from scapy.layers.l2 import ARP, Ether
 from scapy.sendrecv import sr
 
 import ArpUtils
+import Logger
 from AttackHandler import AttackHandler
 from PacketWrapper import ARPPacket, ARPReplyPacket, MACPacket
 
@@ -21,7 +22,7 @@ def find_devices_on_network():
     arp_request.pdst = arp_request.psrc + "/24"
     sr(arp_request, timeout=1, verbose=False)
     scapy_logger.setLevel(old_level)
-    print("ARP SCAN COMPLETE")
+    Logger.log("ARP SCAN COMPLETE")
 
 
 class ARPHandler(AttackHandler):
@@ -62,9 +63,9 @@ class ARPHandler(AttackHandler):
             ip = arp_packet.get_source_ip()
             if ip not in self.arp_table:
                 self.arp_table[ip] = arp_packet.get_response_mac()
-                print(f"ADD ARP ENTRY: IP {ip} has MAC address {self.arp_table[ip]}")
+                Logger.log(f"ADD ARP ENTRY: IP {ip} has MAC address {self.arp_table[ip]}")
             elif arp_packet.get_response_mac() != self.arp_table[ip]:
-                print(
+                Logger.log(
                     f"DETECTED ARP POISONING: IP {ip} has multiple MAC addresses: {self.arp_table[ip]} and {arp_packet.get_response_mac()}"
                 )
 
@@ -86,14 +87,14 @@ class ARPHandler(AttackHandler):
                 if ArpUtils.set_static_arp(ip, self.arp_table[ip]):
                     self.static_arp_table[ip] = self.arp_table[ip]
                     self.save_attack(arp_packet, True)
-                    print("ARP PROTECTION SUCCESSFUL")
+                    Logger.log("ARP PROTECTION SUCCESSFUL")
                     return
                 else:
-                    print("ARP PROTECTION FAILED (are you root?)")
+                    Logger.log("ARP PROTECTION FAILED (are you root?)")
                     self.save_attack(arp_packet, False)
                     return
         except Exception as e:
-            print(f"ARP PROTECTION ERROR {e}")
+            Logger.log(f"ARP PROTECTION ERROR {e}")
             self.save_attack(arp_packet, False)
 
     def cleanup(self):
@@ -102,3 +103,4 @@ class ARPHandler(AttackHandler):
         """
         for ip in self.static_arp_table:
             ArpUtils.remove_static_arp(ip)
+        Logger.log("ARP CLEANUP SUCCESSFUL")
