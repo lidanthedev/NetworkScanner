@@ -74,9 +74,9 @@ class PortscanHandler(AttackHandler):
             self.ip_ports_map[better_packet.get_source_ip()].append(better_packet.get_destination_port())
             counter = len(self.ip_ports_map[better_packet.get_source_ip()])
             if better_packet.get_source_ip() in self.blacklisted_ips:
-                self.protect_attack(better_packet)
+                self.try_protect_attack(better_packet)
             elif counter > MAX_SYNS:
-                self.protect_attack(better_packet)
+                self.try_protect_attack(better_packet)
                 if time.time() - self.time_since_last_alert > 60:
                     self.time_since_last_alert = time.time()
                     Logger.log(f"Portscan detected from ip {better_packet.get_source_ip()}!")

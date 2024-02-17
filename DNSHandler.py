@@ -106,7 +106,7 @@ class DNSHandler(AttackHandler):
                 f'DNS SPOOFING DETECTED: {domain} has multiple IP addresses: {response} and {self.dns_table[domain]}')
             self.notify(
                 f'{domain} has multiple IP addresses: {response} and {self.dns_table[domain]}')
-            self.protect_attack(better_packet)
+            self.try_protect_attack(better_packet)
 
     def is_in_same_subnet(self, ip, ip_list):
         """

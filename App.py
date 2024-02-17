@@ -16,7 +16,7 @@ scanner.start()
 
 
 @app.route("/setAttackState", methods=["POST"])
-def toggle_attack_state():
+def set_attack_state():
     """
     Toggle the state of an attack.
     :return: The state of the attack.
@@ -63,7 +63,7 @@ def get_attacks_state():
     Get the state of the attacks.
     :return: The state of the attacks.
     """
-    return [{"id": handler.handler_id, "state": handler.enabled} for handler in scanner.handlers]
+    return [{"id": handler.handler_id, "state": handler.state} for handler in scanner.handlers]
 
 
 @app.route("/getNotifications")

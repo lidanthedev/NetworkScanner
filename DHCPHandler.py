@@ -1,10 +1,9 @@
 import time
 
-import iptablesUtils
-from AttackHandler import AttackHandler
 from scapy.layers.dhcp import DHCP
 
 import WifiUtils
+import iptablesUtils
 import Logger
 from AttackHandler import AttackHandler
 
@@ -41,7 +40,7 @@ class DHCPHandler(AttackHandler):
                 # is not the same then there is an attack going on
                 if self.mac_table[network_name] != better_packet.get_source_mac():
                     Logger.log("DHCP Attack detected")
-                    self.protect_attack(better_packet)
+                    self.try_protect_attack(better_packet)
                     self.notify(f"MAC doesn't match {self.mac_table[network_name]} with {better_packet.get_source_mac()}")
             # save the mac address of the joined network if it's the first time joining it
             else:

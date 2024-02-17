@@ -72,7 +72,7 @@ class ARPHandler(AttackHandler):
                 self.notify(
                     f"IP {ip} has multiple MAC addresses: {self.arp_table[ip]} and {arp_packet.get_response_mac()}"
                 )
-                self.protect_attack(arp_packet)
+                self.try_protect_attack(arp_packet)
 
     def protect_attack(self, arp_packet):
         """
