@@ -102,4 +102,3 @@ class ARPHandler(AttackHandler):
         """
         for ip in self.static_arp_table:
             ArpUtils.remove_static_arp(ip)
-        print("ARP CLEANUP SUCCESSFUL")

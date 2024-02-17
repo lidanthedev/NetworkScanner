@@ -101,14 +101,18 @@ class IPPacket(MACPacket):
         Returns the source IP address
         :return: the source IP address
         """
-        return self.packet[IP].src
+        if self.packet.haslayer(IP):
+            return self.packet[IP].src
+        return "UNKNOWN"
 
     def get_destination_ip(self) -> str:
         """
         Returns the destination IP address
         :return: the destination IP address
         """
-        return self.packet[IP].dst
+        if self.packet.haslayer(IP):
+            return self.packet[IP].dst
+        return "UNKNOWN"
 
 
 class TCPPacket(IPPacket):
@@ -204,7 +208,7 @@ class ARPReplyPacket(ARPPacket):
         return self.packet[ARP].hwsrc
 
 
-class DNSPacket(MACPacket):
+class DNSPacket(IPPacket):
     TYPE_QUERY = "Query"
     TYPE_ANSWER = "Answer"
     TYPE_OTHER = "Other"
@@ -266,12 +270,12 @@ def to_better_packet(scapy_packet, nfq_packet):
     """
     if scapy_packet.haslayer(DHCP) and scapy_packet.haslayer(IP):
         return DHCPPacket(scapy_packet, nfq_packet)
+    elif scapy_packet.haslayer(DNS):
+        return DNSPacket(scapy_packet, nfq_packet)
     if scapy_packet.haslayer(TCP) and scapy_packet.haslayer(IP):
         return TCPPacket(scapy_packet, nfq_packet)
     elif scapy_packet.haslayer(IP):
         return IPPacket(scapy_packet, nfq_packet)
-    elif scapy_packet.haslayer(DNS) and scapy_packet.haslayer(Ether):
-        return DNSPacket(scapy_packet, nfq_packet)
     elif scapy_packet.haslayer(ARP) and scapy_packet.haslayer(Ether):
         if scapy_packet[ARP].op == ARP_REQUEST_CODE:
             return ARPPacket(scapy_packet, nfq_packet)
