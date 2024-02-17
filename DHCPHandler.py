@@ -4,8 +4,9 @@ import iptablesUtils
 from AttackHandler import AttackHandler
 from scapy.layers.dhcp import DHCP
 
-import JsonUtils
 import WifiUtils
+from AttackHandler import AttackHandler
+
 
 class DHCPHandler(AttackHandler):
 
@@ -39,7 +40,7 @@ class DHCPHandler(AttackHandler):
                 # is not the same then there is an attack going on
                 if self.mac_table[network_name] != better_packet.get_source_mac():
                     print("DHCP ATTACK DETECTED!!!!!!")
-                    self.save_attack(better_packet, False)
+                    self.protect_attack(better_packet)
                     self.notify(f"MAC doesn't match {self.mac_table[network_name]} with {better_packet.get_source_mac()}")
             # save the mac address of the joined network if it's the first time joining it
             else:
@@ -53,19 +54,24 @@ class DHCPHandler(AttackHandler):
         :return: None
         """
 
-        # LEAVE WIFI
-        current_interface = WifiUtils.get_wifi_interface()
-        current_ssid = WifiUtils.get_current_ssid()
+        try:
+            # LEAVE WIFI
+            current_interface = WifiUtils.get_wifi_interface()
+            current_ssid = WifiUtils.get_current_ssid()
 
-        WifiUtils.disconnect_from_current_wifi(current_interface)
+            WifiUtils.disconnect_from_current_wifi(current_interface)
 
-        # Block the attacker mac address using the iptables
-        iptablesUtils.block_mac_address(better_packet.get_source_mac())
+            # Block the attacker mac address using the iptables
+            iptablesUtils.block_mac_address(better_packet.get_source_mac())
 
-        # wait a little bit before connecting back
-        time.sleep(3)
-        # RECONNECT WIFI
-        WifiUtils.connect_to_wifi(current_ssid)
+            # wait a little bit before connecting back
+            time.sleep(3)
+            # RECONNECT WIFI
+            WifiUtils.connect_to_wifi(current_ssid)
+            self.save_attack(better_packet, True)
+
+        except:
+            self.save_attack(better_packet, False)
 
 
     def is_packet_dhcp_ack(self, better_packet):
