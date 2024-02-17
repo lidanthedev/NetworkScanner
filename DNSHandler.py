@@ -1,11 +1,10 @@
-from AttackHandler import AttackHandler
-
-import Logger
 import threading
 from ipaddress import IPv4Interface
 
 import requests
 
+import Logger
+from AttackHandler import AttackHandler
 from PacketWrapper import DNSPacket
 
 RESULT_OK = 200
@@ -96,13 +95,10 @@ class DNSHandler(AttackHandler):
         response = better_packet.get_response()
         if response == "":
             response = self.dns_table[domain][0]
-<<<<<<< DNSHandler.py
         if response not in self.dns_table[domain]:
-            Logger.log(
-=======
+            return
         if not self.is_in_same_subnet(response, self.dns_table[domain]):
-            print(
->>>>>>> DNSHandler.py
+            Logger.log(
                 f'DNS SPOOFING DETECTED: {domain} has multiple IP addresses: {response} and {self.dns_table[domain]}')
             self.notify(
                 f'{domain} has multiple IP addresses: {response} and {self.dns_table[domain]}')

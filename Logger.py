@@ -1,6 +1,6 @@
-import os
-import logging
 import datetime
+import logging
+import os
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -14,8 +14,11 @@ file_handler = logging.FileHandler(f'logs/{current_date_and_time.replace(" ", "_
 file_handler.setLevel(logging.INFO)
 file_handler.setFormatter(formatter)
 
-logger.addHandler(file_handler)
+stream_handler = logging.StreamHandler()
+stream_handler.setFormatter(formatter)
 
+logger.addHandler(file_handler)
+logger.addHandler(stream_handler)
 
 def log(message):
     logger.info(message)

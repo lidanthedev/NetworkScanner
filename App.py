@@ -1,11 +1,11 @@
 import atexit
 import json
-import Logger
 
 from flask import Flask, send_from_directory
 from flask import request
 from flask_cors import CORS
 
+import Logger
 from Scanner import Scanner
 
 app = Flask(__name__)
@@ -91,7 +91,9 @@ def get_attacks():
     """
     try:
         with open("attacks.json", "r") as f:
-            return json.loads(f.read())
+            attacks = json.loads(f.read())
+            attacks = attacks[::-1]
+            return attacks
     except FileNotFoundError:
         return []
 
