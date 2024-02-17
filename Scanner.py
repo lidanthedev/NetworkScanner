@@ -8,6 +8,7 @@ from scapy.sendrecv import AsyncSniffer
 
 import PacketWrapper
 import iptablesUtils
+import Logger
 from ARPHandler import ARPHandler
 from AttackHandler import AttackHandler
 from DHCPHandler import DHCPHandler
@@ -90,7 +91,7 @@ class Scanner:
         Start the scanner
         :return: None
         """
-        print("Scanner Started")
+        Logger.log("Started Scans")
         self.state = True
         iptablesUtils.add_ip_table(self.QUEUE_NUM)
         self.queue = NetfilterQueue()
@@ -104,7 +105,7 @@ class Scanner:
         Stop the scanner
         :return: None
         """
-        print("Scanner Stopped")
+        Logger.log("Stopped Scans")
         self.state = False
         self.queue.unbind()
         iptablesUtils.remove_ip_table(self.QUEUE_NUM)
