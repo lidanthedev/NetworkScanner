@@ -36,6 +36,7 @@ class Scanner:
             DNSHandler(),
             PortscanHandler(),
         ]
+        Logger.get_all_logs_files()
         self.queue = NetfilterQueue()
         self.sniffer = AsyncSniffer(prn=self.handle_packet_sniff)
         self.queue_thread = None
