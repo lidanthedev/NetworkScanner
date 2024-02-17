@@ -1,6 +1,7 @@
-import iptc
 import subprocess
 import Logger
+
+import iptc
 
 
 def add_ip_table(id_table):
@@ -32,6 +33,8 @@ def remove_ip_table(id_table):
 
     # Delete the rule from the chain
     chain.delete_rule(rule)
+
+
 # manual disable: sudo iptables -D INPUT -j NFQUEUE --queue-num 0
 
 def make_rule(id_table):
@@ -49,6 +52,7 @@ def make_rule(id_table):
     # Set the rule's target
     rule.target = target
     return rule
+
 
 # manual disable: sudo iptables -L INPUT --line-numbers
 # sudo iptables -D INPUT [NUM]

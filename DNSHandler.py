@@ -1,7 +1,11 @@
 from AttackHandler import AttackHandler
-import requests
 
 import Logger
+import threading
+from ipaddress import IPv4Interface
+
+import requests
+
 from PacketWrapper import DNSPacket
 
 RESULT_OK = 200
@@ -16,7 +20,7 @@ class DNSHandler(AttackHandler):
         """
         Initialize the DNS handler
         """
-        super().__init__(AttackHandler.DNS_HANDLER_ID)
+        super().__init__(AttackHandler.DNS_HANDLER_ID, AttackHandler.NFQUEUE_HANDLER_TYPE)
         self.dns_table = {}
 
     def handle_packet(self, better_packet: DNSPacket):
@@ -27,7 +31,8 @@ class DNSHandler(AttackHandler):
         """
         if isinstance(better_packet, DNSPacket):
             if better_packet.get_type() == DNSPacket.TYPE_QUERY:
-                self.handle_query(better_packet)
+                query_thread = threading.Thread(target=self.handle_query, args=(better_packet,), daemon=True)
+                query_thread.start()
             elif better_packet.get_type() == DNSPacket.TYPE_ANSWER:
                 self.handle_response(better_packet)
 
@@ -37,7 +42,11 @@ class DNSHandler(AttackHandler):
         :param better_packet: the packet to protect against
         :return: None
         """
-        pass
+        try:
+            better_packet.drop()
+            self.save_attack(better_packet, True)
+        except:
+            self.save_attack(better_packet, False)
 
     def handle_query(self, better_packet: DNSPacket):
         """
@@ -87,9 +96,26 @@ class DNSHandler(AttackHandler):
         response = better_packet.get_response()
         if response == "":
             response = self.dns_table[domain][0]
+<<<<<<< DNSHandler.py
         if response not in self.dns_table[domain]:
             Logger.log(
+=======
+        if not self.is_in_same_subnet(response, self.dns_table[domain]):
+            print(
+>>>>>>> DNSHandler.py
                 f'DNS SPOOFING DETECTED: {domain} has multiple IP addresses: {response} and {self.dns_table[domain]}')
-            self.save_attack(better_packet, False)
             self.notify(
                 f'{domain} has multiple IP addresses: {response} and {self.dns_table[domain]}')
+            self.protect_attack(better_packet)
+
+    def is_in_same_subnet(self, ip, ip_list):
+        """
+        Check if an IP address is in the same subnet as any IP address in a list
+        :param ip: the IP address to check
+        :param ip_list: the list of IP addresses
+        :return: True if the IP address is in the same subnet as any IP address in the list, False otherwise
+        """
+        for ip_in_list in ip_list:
+            if IPv4Interface(f'{ip}/24').network == IPv4Interface(f'{ip_in_list}/24').network:
+                return True
+        return False
