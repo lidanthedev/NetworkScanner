@@ -3,6 +3,7 @@ import subprocess
 import time
 
 from AttackHandler import AttackHandler
+import Logger
 import WifiUtils
 
 
@@ -35,9 +36,7 @@ class EvilTwinHandler(AttackHandler):
                 duplicates.remove("")
 
             if len(duplicates) > 0:
-                print(f"Evil Twin Detected, networks that appear more than once:")
-                for network in duplicates:
-                    print(f"\t{network}")
+                Logger.log(f"Evil Twin Detected, networks that appear more than once: {duplicates}")
                 self.notify(f"networks that appear more than once: {duplicates}")
 
     def protect_attack(self, better_packet):

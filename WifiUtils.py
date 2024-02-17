@@ -1,4 +1,5 @@
 import subprocess
+import Logger
 
 
 def get_current_ssid():
@@ -42,11 +43,11 @@ def get_wifi_networks(min_frequency, max_frequency):
 
             return networks
         else:
-            print(f"Error in EvilTwin: {result.stderr} (Are you in Windows?)")
+            Logger.log(f"Error in EvilTwin: {result.stderr} (Are you in Windows?)")
             return None
 
     except Exception as e:
-        print(f"An error occurred with EvilTwin: {e} (Are you in Windows?)")
+        Logger.log(f"An error occurred with EvilTwin: {e} (Are you in Windows?)")
         return None
 
 
@@ -74,9 +75,9 @@ def connect_to_wifi(ssid):
 
     try:
         subprocess.run(cmd, shell=True, check=True)
-        print(f"Successfully connected to {ssid}")
+        Logger.log(f"Successfully connected to {ssid}")
     except subprocess.CalledProcessError as e:
-        print(f"Failed to connect to {ssid}. Error: {e}")
+        Logger.log(f"Failed to connect to {ssid}. Error: {e}")
 
 
 def get_wifi_interface():
@@ -89,5 +90,5 @@ def get_wifi_interface():
         result = subprocess.check_output(cmd, shell=True, text=True).strip()
         return result
     except subprocess.CalledProcessError as e:
-        print(f"Error: {e}")
+        Logger.log(f"Error: {e}")
         return None
