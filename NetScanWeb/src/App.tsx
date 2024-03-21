@@ -6,13 +6,6 @@ import AttacksAccordions from "./AttacksAccordions.tsx";
 import Logs from "./Logs.tsx";
 import { PieChart } from "./PieChart.tsx";
 
-const data = [
-  { name: "Mark", value: 90 },
-  { name: "Robert", value: 12 },
-  { name: "Emily", value: 34 },
-  { name: "Marion", value: 53 },
-  { name: "Nicolas", value: 98 },
-]
 
 function App() {
   const [darkMode, setDarkMode] = useState('dark')
@@ -29,7 +22,7 @@ function App() {
     //   <AttacksAccordions/>
     //   <Logs/>
     // </ThemeProvider>
-    <PieChart data={data} width={400} height={400} />
+    <PieChart width={800} height={800} />
   )
 }
 
