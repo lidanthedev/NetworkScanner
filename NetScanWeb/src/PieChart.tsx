@@ -12,16 +12,6 @@ type DataItem = {
     data: DataItem[];
   };
 
-  interface Attack {
-    Attack_name: string;
-    IP: string;
-    MAC: string;
-    WIFI: string;
-    Time: string;
-    Date: string;
-    Is_Defended: boolean;
-}
-
   const MARGIN_X = 150;
   const MARGIN_Y = 50;
   const INFLEXION_PADDING = 20; // space between donut and label inflexion point
@@ -120,23 +110,24 @@ useEffect(() =>
             y1={centroid[1]}
             x2={inflexionPoint[0]}
             y2={inflexionPoint[1]}
-            stroke={"black"}
-            fill={"black"}
+            stroke={"white"}
+            fill={"white"}
           />
           <line
             x1={inflexionPoint[0]}
             y1={inflexionPoint[1]}
             x2={labelPosX}
             y2={inflexionPoint[1]}
-            stroke={"black"}
-            fill={"black"}
+            stroke={"white"}
+            fill={"white"}
           />
           <text
             x={labelPosX + (isRightLabel ? 2 : -2)}
             y={inflexionPoint[1]}
             textAnchor={textAnchor}
             dominantBaseline="middle"
-            fontSize={14}
+            style={{ fill: "white" }}
+            fontSize={12}
           >
             {label}
           </text>
