@@ -5,6 +5,7 @@ import Scanner from "./Scanner.tsx";
 import AttacksAccordions from "./AttacksAccordions.tsx";
 import Logs from "./Logs.tsx";
 import { PieChart } from "./PieChart.tsx";
+import Statistics from "./Statistics.tsx";
 
 
 function App() {
@@ -16,13 +17,15 @@ function App() {
     },
   });
   return (
-    // <ThemeProvider theme={darkTheme}>
-    //   <CssBaseline/>
-    //   <Scanner/>
-    //   <AttacksAccordions/>
-    //   <Logs/>
-    // </ThemeProvider>
-    <PieChart width={800} height={800} />
+    <div>
+      <ThemeProvider theme={darkTheme}>
+        <CssBaseline/>
+        <Scanner/>
+        <AttacksAccordions/>
+        <Logs/>
+      </ThemeProvider>
+      <Statistics />
+    </div>
   )
 }
 

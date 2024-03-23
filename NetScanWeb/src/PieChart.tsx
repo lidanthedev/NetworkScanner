@@ -28,29 +28,7 @@ const colors = [
 ];
 
 
-export const PieChart = ({ width, height }: PieChartProps) => {
-
-  const [data, setData] = useState<DataItem[]>([]);
-  const getAttacks = () => {
-    return fetch('http://localhost:5000/getAttacks').then(response => response.json());
-  }
-  useEffect(() => {
-    getAttacks().then((attacks) => {
-
-      const attackDict: { [key: string]: number } = {};
-
-      for (const item of attacks) {
-        const attackName = item.Attack_name;
-        if (attackName in attackDict) {
-          attackDict[attackName] += 1;
-        } else {
-          attackDict[attackName] = 1;
-        }
-      }
-
-      setData(Object.entries(attackDict).map(([name, value]) => ({ name, value })));
-    });
-  }, []);
+export const PieChart = ({ data ,width, height }: PieChartProps) => {
 
   const ref = useRef(null);
 
