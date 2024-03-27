@@ -20,7 +20,7 @@ class DNSHandler(AttackHandler):
         Initialize the DNS handler
         """
         super().__init__(AttackHandler.DNS_HANDLER_ID, AttackHandler.NFQUEUE_HANDLER_TYPE)
-        self.dns_table = {}
+        self.dns_table = {"dns.google": ["8.8.8.8", "8.8.4.4"]}
 
     def handle_packet(self, better_packet: DNSPacket):
         """

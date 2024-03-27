@@ -31,8 +31,8 @@ export default function Logs() {
       <h3>Logs</h3>
       {logs.slice(page * itemsPerPage, (page + 1) * itemsPerPage).map((log, index) => {
         return (
-          <div>
-            <a href={`http://localhost:5000/log/${log}`} key={index}>{log}</a>
+          <div key={index}>
+            <a href={`http://localhost:5000/log/${log}`}>{log}</a>
           </div>
         )
       })}
