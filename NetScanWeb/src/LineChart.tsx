@@ -30,7 +30,7 @@ export const LineChart = ({ width, height, data }: LineChartProps) => {
     const xScale = useMemo(() => {
         return d3
             .scaleLinear()
-            .domain([0, xMax || 0])
+            .domain([xMin || 0, xMax || 0])
             .range([0, boundsWidth]);
     }, [data, width]);
 
