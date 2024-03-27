@@ -1,10 +1,11 @@
 import atexit
 import json
 
-from flask import Flask
+from flask import Flask, send_from_directory
 from flask import request
 from flask_cors import CORS
 
+import Logger
 from Scanner import Scanner
 
 app = Flask(__name__)
@@ -15,7 +16,7 @@ scanner.start()
 
 
 @app.route("/setAttackState", methods=["POST"])
-def toggle_attack_state():
+def set_attack_state():
     """
     Toggle the state of an attack.
     :return: The state of the attack.
@@ -25,7 +26,7 @@ def toggle_attack_state():
     state = data["state"]
 
     scanner.set_attack_state(attack_id, state)
-    print(f"Attack {attack_id} state set to {state}")
+    Logger.log(f"Attack {attack_id} state set to {state}")
     return {"id": attack_id, "state": state}
 
 
@@ -62,7 +63,7 @@ def get_attacks_state():
     Get the state of the attacks.
     :return: The state of the attacks.
     """
-    return [{"id": handler.handler_id, "state": handler.enabled} for handler in scanner.handlers]
+    return [{"id": handler.handler_id, "state": handler.state} for handler in scanner.handlers]
 
 
 @app.route("/getNotifications")
@@ -90,9 +91,21 @@ def get_attacks():
     """
     try:
         with open("attacks.json", "r") as f:
-            return json.loads(f.read())
+            attacks = json.loads(f.read())
+            attacks = attacks[::-1]
+            return attacks
     except FileNotFoundError:
         return []
+
+
+@app.route("/logs")
+def logs():
+    return Logger.get_all_logs_files()
+
+
+@app.route("/log/<filename>")
+def get_log(filename):
+    return send_from_directory('logs', filename)
 
 
 if __name__ == "__main__":

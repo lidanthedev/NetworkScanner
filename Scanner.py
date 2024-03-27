@@ -8,6 +8,7 @@ from scapy.sendrecv import AsyncSniffer
 
 import PacketWrapper
 import iptablesUtils
+import Logger
 from ARPHandler import ARPHandler
 from AttackHandler import AttackHandler
 from DHCPHandler import DHCPHandler
@@ -35,6 +36,7 @@ class Scanner:
             DNSHandler(),
             PortscanHandler(),
         ]
+        Logger.get_all_logs_files()
         self.queue = NetfilterQueue()
         self.sniffer = AsyncSniffer(prn=self.handle_packet_sniff)
         self.queue_thread = None
@@ -52,7 +54,7 @@ class Scanner:
             for handler in self.handlers:
                 if (
                     handler.handler_type == AttackHandler.NFQUEUE_HANDLER_TYPE
-                    and handler.enabled
+                    and (handler.state == AttackHandler.MODE_PROTECT or handler.state == AttackHandler.MODE_DETECT)
                 ):
                     handler.handle_packet(better_packet)
         if not better_packet.dropped:
@@ -69,7 +71,7 @@ class Scanner:
             for handler in self.handlers:
                 if (
                     handler.handler_type == AttackHandler.SCAPY_HANDLER_TYPE
-                    and handler.enabled
+                    and (handler.state == AttackHandler.MODE_PROTECT or handler.state == AttackHandler.MODE_DETECT)
                 ):
                     handler.handle_packet(better_packet)
 
@@ -82,7 +84,7 @@ class Scanner:
         """
         for handler in self.handlers:
             if handler.handler_id == id_attack:
-                handler.enabled = state
+                handler.state = state
                 return
 
     def start(self):
@@ -90,7 +92,7 @@ class Scanner:
         Start the scanner
         :return: None
         """
-        print("Scanner Started")
+        Logger.log("Started Scans")
         self.state = True
         iptablesUtils.add_ip_table(self.QUEUE_NUM)
         self.queue = NetfilterQueue()
@@ -104,7 +106,7 @@ class Scanner:
         Stop the scanner
         :return: None
         """
-        print("Scanner Stopped")
+        Logger.log("Stopped Scans")
         self.state = False
         self.queue.unbind()
         iptablesUtils.remove_ip_table(self.QUEUE_NUM)
@@ -118,7 +120,7 @@ class Scanner:
         """
         notifications = []
         for handler in self.handlers:
-            if handler.enabled:
+            if handler.state == AttackHandler.MODE_PROTECT or handler.state == AttackHandler.MODE_DETECT:
                 notifications += handler.notifications
                 handler.notifications = []
         return notifications

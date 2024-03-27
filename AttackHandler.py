@@ -2,6 +2,7 @@ import time
 import uuid
 from abc import ABC, abstractmethod
 
+import Logger
 import JsonUtils
 import WifiUtils
 
@@ -16,9 +17,14 @@ class AttackHandler(ABC):
     SCAPY_HANDLER_TYPE = "scapy"
     NFQUEUE_HANDLER_TYPE = "nfqueue"
 
+    MODE_OFF = "OFF"
+    MODE_DETECT = "DETECT"
+    MODE_PROTECT = "PROTECT"
+
     notifications: list[dict]
     handler_id: str
     handler_type: str
+    state: str
 
     def __init__(self, handler_id, handler_type=SCAPY_HANDLER_TYPE):
         """
@@ -29,7 +35,7 @@ class AttackHandler(ABC):
         """
         self.notifications = []
         self.handler_id = handler_id
-        self.enabled = True
+        self.state = self.MODE_PROTECT
         self.handler_type = handler_type
 
     @abstractmethod
@@ -40,6 +46,17 @@ class AttackHandler(ABC):
         :return: None
         """
         pass
+
+    def try_protect_attack(self, better_packet):
+        """
+        Protect against an attack if the mode is set to protect
+        :param better_packet: the packet to protect against
+        :return: None
+        """
+        if self.state == self.MODE_PROTECT:
+            self.protect_attack(better_packet)
+        else:
+            self.save_attack(better_packet)
 
     @abstractmethod
     def protect_attack(self, better_packet):
@@ -69,7 +86,7 @@ class AttackHandler(ABC):
                                         "Date": time.strftime("%d/%m/%Y"),
                                         "Is_Defended": is_defended})
         except:
-            print("Error saving attack data")
+            Logger.log("Error saving attack data")
 
     def notify(self, body, title=None):
         """
