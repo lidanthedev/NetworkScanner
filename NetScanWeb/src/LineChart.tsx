@@ -11,12 +11,10 @@ type LineChartProps = {
 };
 
 export const LineChart = ({ width, height, data }: LineChartProps) => {
-    // bounds = area inside the graph axis = calculated by substracting the margins
     const axesRef = useRef(null);
     const boundsWidth = width - MARGIN.right - MARGIN.left;
     const boundsHeight = height - MARGIN.top - MARGIN.bottom;
 
-    // Y axis
     const [min, max] = d3.extent(data, (d) => d.y);
     const yScale = useMemo(() => {
         return d3
@@ -25,7 +23,6 @@ export const LineChart = ({ width, height, data }: LineChartProps) => {
             .range([boundsHeight, 0]);
     }, [data, height]);
 
-    // X axis
     const [xMin, xMax] = d3.extent(data, (d) => d.x);
     const xScale = useMemo(() => {
         return d3
@@ -34,21 +31,14 @@ export const LineChart = ({ width, height, data }: LineChartProps) => {
             .range([0, boundsWidth]);
     }, [data, width]);
 
-    // Render the X and Y axis using d3.js, not react
     useEffect(() => {
         const svgElement = d3.select(axesRef.current);
         svgElement.selectAll("*").remove();
-        const xAxisGenerator = d3.axisBottom(xScale);
-        svgElement
-            .append("g")
-            .attr("transform", "translate(0," + boundsHeight + ")")
-            .call(xAxisGenerator);
 
         const yAxisGenerator = d3.axisLeft(yScale);
         svgElement.append("g").call(yAxisGenerator);
     }, [xScale, yScale, boundsHeight]);
 
-    // Build the line
     const lineBuilder = d3
         .line<DataPoint>()
         .x((d) => xScale(d.x))
