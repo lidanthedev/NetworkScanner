@@ -64,6 +64,8 @@ class DNSHandler(AttackHandler):
         :return: None
         """
         result_ip = ""
+        if domain.endswith(".local."):
+            return result_ip
         try:
             res = requests.get(GOOGLE_DNS, params={"name": domain, "type": "A"})
             if res.status_code == RESULT_OK:
@@ -78,7 +80,7 @@ class DNSHandler(AttackHandler):
                     self.dns_table[domain] = addresses
                     Logger.log("GOOGLE DNS: " + domain + " -> " + result_ips)
             else:
-                Logger.log("GOOGLE DNS Error: " + str(res.status_code))
+                Logger.log("GOOGLE DNS Error: " + str(res.status_code) + " " + domain)
         except Exception as error:
             Logger.log("GOOGLE DNS Error: " + str(error))
         return result_ip
@@ -95,7 +97,7 @@ class DNSHandler(AttackHandler):
         response = better_packet.get_response()
         if response == "":
             response = self.dns_table[domain][0]
-        if response not in self.dns_table[domain]:
+        if response in self.dns_table[domain]:
             return
         if not self.is_in_same_subnet(response, self.dns_table[domain]):
             Logger.log(
