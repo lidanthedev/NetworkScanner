@@ -13,7 +13,7 @@ This project is a network scanner to detect and defend from
 
 Install dependencies for Backend:
 ```bash
-apt-get install build-essential python3-full libnetfilter-queue-dev npm python3-pip
+apt-get install build-essential python3-full python3-pip libnetfilter-queue-dev
 pip install -r requirements.txt
 ```
 
