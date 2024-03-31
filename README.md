@@ -2,7 +2,7 @@
 
 ## Mission 🎯
 
-This project is a network scanner that detects and defends from mitm attacks including arp poisoning, dhcp spoofing, dns spoofing, evil twin, port scan
+This project is a network scanner that detects and defends from MITM (Man in the middle) attacks including arp poisoning, dhcp spoofing, dns spoofing, evil twin, port scan
 
 ## Installation
 
