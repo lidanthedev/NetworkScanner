@@ -34,3 +34,25 @@ npm run dev
 ## Usage
 Open your browser and go to `http://localhost:5173`
 There you can manage the network scanner and see the results.
+
+## Troubleshooting
+NodeJS Engine not supported:
+Install the latest version of NodeJS from the official website.
+Or use NVM (Node Version Manager) to install the latest version of NodeJS.
+
+```bash
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+nvm install 21
+```
+
+Python Version not supported:
+Install the latest version of Python from the official website.
+
+If the program is crashed and your internet connection is not working run the following command:
+```bash
+sudo iptables -D INPUT 1
+```
+
+## Known Issues
+* The program is not working on Windows.
+* Google DNS may block the requests and it will show as an error.
