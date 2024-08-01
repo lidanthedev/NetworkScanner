@@ -12,7 +12,7 @@ export default function Scanner() {
 
   return (
     <div>
-      <h1>Toggle Scanner</h1>
+      <h1>Network Scanner</h1>
 
       <button
         onClick={async (event) => {
